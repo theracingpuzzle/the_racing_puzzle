@@ -1,0 +1,168 @@
+/* sidebar.css */
+
+/* Sidebar styles */
+.wrapper {
+    display: flex;
+    height: 100vh;
+}
+
+.sidebar {
+    width: 250px;
+    background-color: #26334e;
+    color: white;
+    transition: width 0.3s ease, padding 0.3s ease;
+    padding: 20px;
+    min-height: 100vh; /* Ensures the sidebar grows with content */
+    overflow-y: auto; /* Allows scrolling when content overflows */
+    position: fixed; /* Keeps it fixed while scrolling */
+    left: 0;
+    top: 0;
+    bottom: 0; /* Ensures it stretches to the bottom */
+    box-shadow: 2px 0 8px rgba(0, 0, 0, 0.2);
+}
+
+.sidebar.collapsed {
+    width: 60px; /* Collapsed width */
+}
+
+.sidebar .logo {
+    width: 50px;
+    height: 50px;
+    object-fit: cover;
+    border-radius: 50%;
+    margin-bottom: 15px;
+}
+
+.sidebar .title {
+    font-size: 18px;
+    color: white;
+    margin-left: 10px;
+    transition: opacity 0.2s ease, visibility 0.3s ease;
+    white-space: nowrap;
+    font-weight: bold;
+}
+
+.sidebar.collapsed .title {
+    opacity: 0;
+    visibility: hidden;
+    width: 0;
+    margin-left: 0;
+}
+
+.sidebar a {
+    display: flex;
+    align-items: center;
+    padding: 12px 15px;
+    color: white;
+    text-decoration: none;
+    border-radius: 5px;
+    margin-bottom: 12px;
+    white-space: nowrap;
+    font-size: 16px;
+    transition: background-color 0.3s ease, padding-left 0.3s ease;
+}
+
+.sidebar a:hover {
+    background-color: #444;
+    padding-left: 15px; /* Indentation effect on hover */
+}
+
+.sidebar a.active {
+    background-color: #5a6b80;
+    padding-left: 20px; /* Indentation effect for active item */
+}
+
+.sidebar a i {
+    width: 25px; /* Adjusted from min-width */
+    height: 25px;
+    display: flex;
+    align-items: center;
+    justify-content: center; /* Centers icons perfectly */
+    font-size: 18px;
+    margin-right: 10px;
+}
+
+/* Main content styles */
+.content {
+    flex: 1;
+    padding-left: 250px; /* Adjust main content when sidebar is expanded */
+    transition: padding-left 0.3s ease; /* Smooth transition for content margin */
+}
+
+.content-collapsed {
+    margin-left: 60px; /* Adjust main content when sidebar is collapsed */
+}
+
+/* Toggle button styles */
+#toggleSidebar {
+    cursor: pointer;
+    color: white;
+    padding: 12px;
+    background: #26334e;
+    border: none;
+    font-size: 20px;
+    margin-bottom: 20px;
+    margin-left: 15px;
+    transition: background-color 0.3s ease;
+    border-radius: 8px;
+}
+
+#toggleSidebar:hover {
+    background-color: #324868;
+}
+
+#sidebarTitle {
+    font-size: 20px;
+    font-weight: bold;
+    color: white;
+    margin-left: 10px;
+    transition: opacity 0.2s ease, visibility 0.3s ease;
+}
+
+.sidebar.collapsed #sidebarTitle {
+    opacity: 0;
+    width: 0;
+    visibility: hidden;
+}
+
+/* Media queries for mobile responsiveness */
+@media (max-width: 768px) {
+    .sidebar {
+        width: 200px;
+    }
+    
+    .content {
+        margin-left: 200px;
+    }
+    
+    .sidebar.collapsed {
+        width: 50px;
+    }
+    
+    .content-collapsed {
+        margin-left: 50px;
+    }
+}
+
+/* Smaller devices (mobile) */
+@media (max-width: 480px) {
+    .sidebar {
+        width: 180px;
+    }
+
+    .content {
+        margin-left: 180px;
+    }
+
+    .sidebar.collapsed {
+        width: 45px;
+    }
+
+    .content-collapsed {
+        margin-left: 45px;
+    }
+
+    #toggleSidebar {
+        font-size: 18px;
+    }
+}
