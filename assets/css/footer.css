@@ -1,75 +1,71 @@
-/* Footer Styles */
 .site-footer {
-    background: linear-gradient(135deg, #333, #222);
-    color: #fff;
-    padding: 20px 0;
-    text-align: center;
-    font-size: 14px;
     position: relative;
-    bottom: 0;
+    color: white;
+    text-align: center;
+    padding: 20px 0;
+}
+
+.footer-background {
+    background-image: url("../images/puzzle.png"); /* Update with your image path */
+    background-size: cover;
+    background-position: center;
+    position: relative;
+    padding: 50px 0;
+}
+
+.footer-overlay {
+    position: absolute;
+    top: 0;
+    left: 0;
     width: 100%;
+    height: 100%;
+    background: rgba(192, 188, 188, 0.6); Dark overlay for readability
 }
 
 .footer-container {
+    position: relative;
     display: flex;
     justify-content: space-between;
     align-items: center;
-    max-width: 1200px;
-    margin: 0 auto;
-    padding: 0 20px;
     flex-wrap: wrap;
-    border-top: 1px solid #444;
+    max-width: 1200px;
+    margin: auto;
+    padding: 20px;
+    z-index: 2;
 }
 
-/* Footer Navigation */
-.footer-center .footer-nav ul {
+.footer-left, .footer-center, .footer-right {
+    flex: 1;
+    min-width: 250px;
+}
+
+.footer-nav ul {
     list-style: none;
     padding: 0;
-    margin: 0;
-    display: flex;
-    gap: 15px;
 }
 
-.footer-center .footer-nav ul li {
+.footer-nav ul li {
     display: inline;
+    margin: 0 10px;
 }
 
-.footer-center .footer-nav ul li a {
-    color: #fff;
+.footer-nav a {
+    color: white;
     text-decoration: none;
-    font-size: 16px;
-    font-weight: 500;
-    transition: color 0.3s ease, transform 0.2s ease-in-out;
 }
 
-.footer-center .footer-nav ul li a:hover {
-    color: #f8c146;
-    transform: translateY(-2px);
-}
-
-/* Social Media Icons */
-.footer-right .social-icons {
-    display: flex;
-    gap: 15px;
-}
-
-.footer-right .social-icons a {
+.social-icons a {
+    color: white;
     font-size: 24px;
-    color: #fff;
-    transition: color 0.3s ease-in-out, transform 0.3s ease-in-out;
+    margin: 0 10px;
+    transition: transform 0.3s ease;
 }
 
-.footer-right .social-icons a:hover {
-    color: #f8c146;
+.social-icons a:hover {
     transform: scale(1.2);
 }
 
-/* Responsive Design */
-@media (max-width: 768px) {
-    .footer-container {
-        flex-direction: column;
-        text-align: center;
-        gap: 20px;
-        padding: 20px 0;
-    }
+.follow-us-text {
+    margin-bottom: 10px;
+    font-weight: bold;
 }

@@ -15,30 +15,36 @@ if ($page === "dashboard") {
 <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap-icons/font/bootstrap-icons.css">
 
 <footer class="site-footer">
-    <div class="footer-container">
-        <!-- Left Section -->
-        <div class="footer-left">
-            <p>&copy; <?php echo date("Y"); ?> Horse Racing Leagues. All rights reserved.</p>
-        </div>
-        
-        <!-- Center Section -->
-        <div class="footer-center">
-            <nav class="footer-nav">
-                <ul>
-                    <li><a href="/about-us.php">About Us</a></li>
-                    <li><a href="/privacy-policy.php">Privacy Policy</a></li>
-                    <li><a href="/terms-of-service.php">Terms of Service</a></li>
-                    <li><a href="/contact.php">Contact</a></li>
-                </ul>
-            </nav>
-        </div>
+    <div class="footer-background">
+        <!-- Overlay to make text readable -->
+        <div class="footer-overlay"></div>
 
-        <!-- Right Section -->
-        <div class="footer-right">
-            <div class="social-icons">
-                <a href="#" aria-label="Facebook"><i class="bi bi-facebook"></i></a>
-                <a href="#" aria-label="Twitter"><i class="bi bi-twitter-x"></i></a>
-                <a href="#" aria-label="Instagram"><i class="bi bi-instagram"></i></a>
+        <div class="footer-container">
+            <!-- Left Section -->
+            <div class="footer-left">
+                <p>&copy; <?php echo date("Y"); ?> The Racing Puzzle. All rights reserved.</p>
+            </div>
+            
+            <!-- Center Section -->
+            <div class="footer-center">
+                <nav class="footer-nav">
+                    <ul>
+                        <li><a href="/about-us.php">About Us</a></li>
+                        <li><a href="/privacy-policy.php">Privacy Policy</a></li>
+                        <li><a href="/terms-of-service.php">Terms of Service</a></li>
+                        <li><a href="/contact.php">Contact</a></li>
+                    </ul>
+                </nav>
+            </div>
+
+            <!-- Right Section - Social Media -->
+            <div class="footer-right">
+                <p class="follow-us-text">Follow us on social media:</p>
+                <div class="social-icons">
+                    <a href="#" aria-label="Facebook"><i class="bi bi-facebook"></i></a>
+                    <a href="#" aria-label="Twitter"><i class="bi bi-twitter-x"></i></a>
+                    <a href="#" aria-label="Instagram"><i class="bi bi-instagram"></i></a>
+                </div>
             </div>
         </div>
     </div>

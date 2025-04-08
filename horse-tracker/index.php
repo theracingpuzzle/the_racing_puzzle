@@ -8,7 +8,12 @@
     <meta name="description" content="Track your favorite race horses and receive notifications for upcoming races">
     <link rel="stylesheet" href="assets/css/horse-tracker.css">
     <link rel="stylesheet" href="../assets/css/sidebar.css">
-    <link rel="manifest" href="manifest.json">
+    <link rel="stylesheet" href="assets/css/horse-tracker.css">
+    
+     <!-- Add Bootstrap for layout and styling -->
+     <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0-alpha1/dist/css/bootstrap.min.css" rel="stylesheet">
+    <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0-beta3/css/all.min.css" rel="stylesheet">
+    
 </head>
 <body>
     <div class="container">
@@ -18,40 +23,50 @@
         </header>
 
         <main>
-            <section class="add-horse-section">
-                <h2>Add New Horse</h2>
-                <form id="add-horse-form">
-                    <div class="form-group">
-                        <label for="horse-name">Horse Name:</label>
-                        <input type="text" id="horse-name" required>
-                    </div>
-                    <div class="form-group">
-                        <label for="trainer">Trainer:</label>
-                        <input type="text" id="trainer">
-                    </div>
-                    <div class="form-group">
-                        <label for="jockey">Jockey:</label>
-                        <input type="text" id="jockey">
-                    </div>
-                    <div class="form-group">
-                        <label for="next-race-date">Next Race Date:</label>
-                        <input type="datetime-local" id="next-race-date">
-                    </div>
-                    <div class="form-group">
-                        <label for="race-location">Race Location:</label>
-                        <input type="text" id="race-location">
-                    </div>
-                    <div class="form-group">
-                        <label for="last-run-notes">Last Run Notes:</label>
-                        <textarea id="last-run-notes" rows="4"></textarea>
-                    </div>
-                    <div class="form-group">
-                        <label for="notification">Notify for next race:</label>
-                        <input type="checkbox" id="notification" checked>
-                    </div>
-                    <button type="submit" class="btn">Add Horse</button>
-                </form>
-            </section>
+            <!-- Add a button to open the modal -->
+<div class="add-horse-button-container">
+    <button id="open-add-horse-modal" class="btn">Add New Horse</button>
+</div>
+
+<!-- Convert the add-horse-section to a modal -->
+<div id="add-horse-modal" class="modal">
+    <div class="modal-content">
+        <span class="close-add-modal">&times;</span>
+        <h2>Add New Horse</h2>
+        <form id="add-horse-form">
+            <!-- Your existing form fields remain the same -->
+            <div class="form-group">
+                <label for="horse-name">Horse Name:</label>
+                <input type="text" id="horse-name" required>
+            </div>
+            <div class="form-group">
+                <label for="trainer">Trainer:</label>
+                <input type="text" id="trainer">
+            </div>
+            <div class="form-group">
+                <label for="jockey">Jockey:</label>
+                <input type="text" id="jockey">
+            </div>
+            <div class="form-group">
+                <label for="next-race-date">Next Race Date:</label>
+                <input type="datetime-local" id="next-race-date">
+            </div>
+            <div class="form-group">
+                <label for="race-location">Race Location:</label>
+                <input type="text" id="race-location">
+            </div>
+            <div class="form-group">
+                <label for="last-run-notes">Last Run Notes:</label>
+                <textarea id="last-run-notes" rows="4"></textarea>
+            </div>
+            <div class="form-group">
+                <label for="notification">Notify for next race:</label>
+                <input type="checkbox" id="notification" checked>
+            </div>
+            <button type="submit" class="btn">Add Horse</button>
+        </form>
+    </div>
+</div>
 
             <section class="tracked-horses-section">
                 <h2>Tracked Horses</h2>

@@ -12,7 +12,7 @@
             <span id="sidebarTitle">The Racing Puzzle</span>
         </div>
         
-        <button id="toggleSidebar">
+        <button id="toggleSidebar" class="btn">
             <i class="fas fa-bars"></i>
         </button>
         
@@ -56,4 +56,5 @@
     <div id="mainContent" class="content">
         <!-- Your page content goes here -->
 
-        
+    <!-- Link to sidebar JavaScript -->
+<script src="../assets/js/sidebar.js"></script>

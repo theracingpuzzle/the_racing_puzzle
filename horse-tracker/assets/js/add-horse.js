@@ -40,6 +40,40 @@ document.addEventListener('DOMContentLoaded', () => {
      checkForUpcomingRaces();
 });
 
+// Additional DOM Elements for add horse modal
+const addHorseModal = document.getElementById('add-horse-modal');
+const openAddHorseModal = document.getElementById('open-add-horse-modal');
+const closeAddModal = document.querySelector('.close-add-modal');
+
+// Additional event listeners for the add horse modal
+document.addEventListener('DOMContentLoaded', () => {
+    // Your existing event listeners...
+    
+    // Add these new event listeners
+    openAddHorseModal.addEventListener('click', () => {
+        addHorseModal.style.display = 'block';
+    });
+    
+    closeAddModal.addEventListener('click', () => {
+        addHorseModal.style.display = 'none';
+        // Reset form when closing the modal
+        addHorseForm.reset();
+        editingHorseId = null;
+        document.querySelector('button[type="submit"]').textContent = 'Add Horse';
+    });
+    
+    // Close add horse modal when clicking outside of it
+    window.addEventListener('click', (e) => {
+        if (e.target === addHorseModal) {
+            addHorseModal.style.display = 'none';
+            // Reset form when closing the modal
+            addHorseForm.reset();
+            editingHorseId = null;
+            document.querySelector('button[type="submit"]').textContent = 'Add Horse';
+        }
+    });
+});
+
 // Handle form submissions (both adding and editing)
 function handleFormSubmit(e) {
     e.preventDefault();

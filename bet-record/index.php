@@ -8,6 +8,41 @@ require_once "../includes/db-connection.php"; // This will now use your SQLite c
 $success_message = $error_message = null;
 $stats = ['total' => 0, 'won' => 0, 'lost' => 0, 'pending' => 0, 'total_stake' => 0, 'total_returns' => 0];
 
+function fetchRacecourses() {
+    global $conn;
+    try {
+        $sql = "SELECT * FROM racecourses ORDER BY name ASC";
+        $stmt = $conn->query($sql);
+        $result = $stmt->fetchAll(PDO::FETCH_ASSOC);
+
+        if (!$result) {
+            error_log("No racecourses found in the table.");
+        }
+
+        return $result;
+    } catch(PDOException $e) {
+        error_log("Error fetching racecourses: " . $e->getMessage());
+
+        // Check if the table exists
+        $checkTable = $conn->query("SELECT name FROM sqlite_master WHERE type='table' AND name='racecourses'");
+        if (!$checkTable->fetch()) {
+            error_log("Table 'racecourses' does not exist.");
+        }
+
+        // Fall back to distinct values from bet_records
+        try {
+            $sql = "SELECT DISTINCT racecourse FROM bet_records ORDER BY racecourse ASC";
+            $stmt = $conn->query($sql);
+            return $stmt->fetchAll(PDO::FETCH_COLUMN);
+        } catch(PDOException $e) {
+            error_log("Error fetching distinct racecourses: " . $e->getMessage());
+            return [];
+        }
+    }
+}
+
+
+
 // Process form submission
 if ($_SERVER["REQUEST_METHOD"] == "POST" && isset($_POST['submit'])) {
     try {
@@ -15,11 +50,30 @@ if ($_SERVER["REQUEST_METHOD"] == "POST" && isset($_POST['submit'])) {
         $bet_type = $_POST['bet_type'];
         $stake = floatval($_POST['stake']);
         $selection = $_POST['selection'];
-        $racecourse = $_POST['racecourse'];
         $odds = $_POST['odds'];
         $jockey = $_POST['jockey'];
         $trainer = $_POST['trainer'];
         $outcome = $_POST['outcome'];
+        
+        // Handle racecourse (either selected or new)
+        $racecourse = $_POST['racecourse'];
+        
+        // Check if this is a new racecourse to be added to the database
+        if (isset($_POST['new_racecourse']) && $_POST['new_racecourse'] == '1') {
+            // First check if the racecourse already exists to avoid duplicates
+            $checkSql = "SELECT COUNT(*) FROM racecourses WHERE name = :name";
+            $checkStmt = $conn->prepare($checkSql);
+            $checkStmt->bindParam(':name', $racecourse);
+            $checkStmt->execute();
+            
+            if ($checkStmt->fetchColumn() == 0) {
+                // Add new racecourse to the racecourses table
+                $insertCourseSql = "INSERT INTO racecourses (name) VALUES (:name)";
+                $insertCourseStmt = $conn->prepare($insertCourseSql);
+                $insertCourseStmt->bindParam(':name', $racecourse);
+                $insertCourseStmt->execute();
+            }
+        }
         
         // Calculate returns if bet won
         $returns = 0;
@@ -58,6 +112,7 @@ if ($_SERVER["REQUEST_METHOD"] == "POST" && isset($_POST['submit'])) {
     }
 }
 
+
 // Fetch existing records
 try {
     // SQLite uses different date functions than MySQL
@@ -84,6 +139,9 @@ try {
 } catch(PDOException $e) {
     $error_message = "Error fetching records: " . $e->getMessage();
 }
+
+// Get racecourses
+$racecourses = fetchRacecourses();
 ?>
 
 <!DOCTYPE html>
@@ -113,6 +171,7 @@ try {
                     <button type="button" class="btn btn-success ms-2" onclick="exportToCSV()">
                         <i class="fas fa-file-export"></i> Export CSV
                     </button>
+                    
                 </div>
             </div>
         </div>
@@ -303,10 +362,33 @@ try {
                                 <div class="invalid-feedback">Please enter horse name</div>
                             </div>
                             <div class="col-md-6">
-                                <label for="racecourse" class="form-label">Racecourse</label>
-                                <input type="text" class="form-control" id="racecourse" name="racecourse" required>
-                                <div class="invalid-feedback">Please enter racecourse</div>
-                            </div>
+    <label for="racecourse" class="form-label">Racecourse</label>
+    <select class="form-select" id="racecourse" name="racecourse" required>
+        <option value="">Select Racecourse</option>
+        <?php 
+        // Check if we got array of arrays (from racecourses table) or just values
+        if(!empty($racecourses) && isset($racecourses[0]) && is_array($racecourses[0])) {
+            foreach($racecourses as $course): ?>
+                <option value="<?php echo htmlspecialchars($course['name']); ?>">
+                    <?php echo htmlspecialchars($course['name']); ?>
+                </option>
+            <?php endforeach;
+        } else {
+            // Simple array of values
+            foreach($racecourses as $course): ?>
+                <option value="<?php echo htmlspecialchars($course); ?>">
+                    <?php echo htmlspecialchars($course); ?>
+                </option>
+            <?php endforeach;
+        } ?>
+    </select>
+    <div class="invalid-feedback">Please select a racecourse</div>
+    
+    <!-- This input will appear when "Other" is selected -->
+    <div id="newRacecourseContainer" class="mt-2 d-none">
+        <input type="text" class="form-control" id="newRacecourse" placeholder="Enter new racecourse">
+    </div>
+</div>
                         </div>
                         <div class="row mb-3">
                             <div class="col-md-4">
@@ -357,6 +439,9 @@ try {
     </div>
 
     <?php include_once "../includes/sidebar.php"; ?>
+
+    <!-- Link to sidebar JavaScript -->
+<script src="../assets/js/sidebar.js"></script>
 
     <script src="https://cdnjs.cloudflare.com/ajax/libs/bootstrap/5.3.0/js/bootstrap.bundle.min.js"></script>
     <script src="assets/js/bet-record.js"></script>

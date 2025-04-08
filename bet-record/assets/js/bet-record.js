@@ -268,3 +268,51 @@ function exportToCSV() {
     link.click();
     document.body.removeChild(link);
 }
+
+// Add this to your existing bet-record.js file
+
+document.addEventListener('DOMContentLoaded', function() {
+    // Handle racecourse "Other" option
+    const racecourseSelect = document.getElementById('racecourse');
+    const newRacecourseContainer = document.getElementById('newRacecourseContainer');
+    const newRacecourseInput = document.getElementById('newRacecourse');
+    
+    if (racecourseSelect) {
+        racecourseSelect.addEventListener('change', function() {
+            if (this.value === 'other') {
+                newRacecourseContainer.classList.remove('d-none');
+                newRacecourseInput.setAttribute('required', 'required');
+            } else {
+                newRacecourseContainer.classList.add('d-none');
+                newRacecourseInput.removeAttribute('required');
+            }
+        });
+    }
+    
+    // Update form submission to use the custom racecourse when "Other" is selected
+    const betForm = document.getElementById('betForm');
+    if (betForm) {
+        betForm.addEventListener('submit', function(e) {
+            if (racecourseSelect.value === 'other' && newRacecourseInput.value.trim()) {
+                // Create a hidden input with the new racecourse value
+                const hiddenInput = document.createElement('input');
+                hiddenInput.type = 'hidden';
+                hiddenInput.name = 'racecourse';
+                hiddenInput.value = newRacecourseInput.value.trim();
+                
+                // Create another hidden input to flag this as a new racecourse
+                const flagInput = document.createElement('input');
+                flagInput.type = 'hidden';
+                flagInput.name = 'new_racecourse';
+                flagInput.value = '1';
+                
+                // Replace the select element's name temporarily
+                racecourseSelect.name = 'original_racecourse';
+                
+                // Append the hidden inputs to the form
+                this.appendChild(hiddenInput);
+                this.appendChild(flagInput);
+            }
+        });
+    }
+});

@@ -21,9 +21,6 @@
     <div id="mainContent" class="content">
         <nav class="navbar navbar-expand-lg navbar-light bg-white mb-4 shadow-sm">
             <div class="container-fluid">
-                <button id="toggleSidebar" class="btn">
-                    <i class="fas fa-bars"></i>
-                </button>
                 <span class="navbar-brand ms-3">The Racing Puzzle</span>
                 <div class="ms-auto d-flex align-items-center">
                     <div class="dropdown me-3">
