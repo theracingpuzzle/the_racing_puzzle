@@ -4,7 +4,7 @@
 document.addEventListener('DOMContentLoaded', function() {
     // Fetch the JSON data
     // In production, replace this URL with the path to your actual JSON file
-    fetch('../racecards/assets/js/2025-04-08.json')
+    fetch('../racecards/assets/js/2025-04-09.json')
         .then(response => response.json())
         .then(data => {
             // Process the data
@@ -32,9 +32,10 @@ function generateRaceCards(data) {
             const courseHeader = document.createElement('div');
             courseHeader.className = 'course-header collapsed';
             courseHeader.innerHTML = `
-                <h2>${course} <span class="region-tag">${region}</span></h2>
-                <span class="toggle-icon">+</span>
+            <h2>${course} <span class="region-tag">&nbsp;${region}</span></h2>
+            <span class="toggle-icon">+</span>
             `;
+
             courseContainer.appendChild(courseHeader);
             
             // Create a container for all races at this course
@@ -133,6 +134,7 @@ function createRaceCard(race, raceTime) {
         <tr>
             <th>No.</th>
             <th>Draw</th>
+            <th>Silks</th>
             <th>Horse</th>
             <th>Age</th>
             <th>Weight</th>
@@ -172,9 +174,15 @@ function createRaceCard(race, raceTime) {
             headgearText = `<span class="headgear">(${headgear})</span>`;
         }
         
+        // Handle silks image
+        const silksImg = runner.silk_url ? 
+            `<img src="${runner.silk_url}" alt="Racing silks for ${runner.name}" class="silks-image">` : 
+            `<div class="no-silks">N/A</div>`;
+        
         row.innerHTML = `
             <td>${runner.number}</td>
             <td>${runner.draw || '-'}</td>
+            <td class="silks-cell">${silksImg}</td>
             <td class="horse-name">${runner.name} ${headgearText}</td>
             <td>${runner.age}</td>
             <td>${stonesPounds}</td>
@@ -217,13 +225,17 @@ function convertPoundsToStonesPounds(pounds) {
 
 // Helper function to format race time (24-hour to 12-hour)
 function formatRaceTime(timeString) {
-    // Check if the time is in 24-hour format
-    if (timeString.includes(':')) {
-        const [hours, minutes] = timeString.split(':');
-        const hour = parseInt(hours, 10);
-        const ampm = hour >= 12 ? 'PM' : 'AM';
-        const hour12 = hour % 12 || 12; // Convert 0 to 12
-        return `${hour12}:${minutes} ${ampm}`;
+    // Check if the time already has AM or PM
+    if (timeString.match(/\d{1,2}:\d{2} (AM|PM)/i)) {
+        return timeString; // Already in 12-hour format, return as is
     }
-    return timeString; // Return original if not in expected format
+
+    // Otherwise, assume it's in 12-hour format but missing AM/PM
+    const [hours, minutes] = timeString.split(':');
+    const hour = parseInt(hours, 10);
+
+    // Determine AM/PM based on a reasonable assumption (e.g., morning races)
+    const ampm = hour >= 1 && hour < 12 ? 'AM' : 'PM';
+
+    return `${hour}:${minutes} ${ampm}`;
 }

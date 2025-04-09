@@ -5,18 +5,15 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Horse Racing Cards</title>
 
-    
-    <!-- Remove this one sorted the sidebar -->
-    <button onclick="goHome()">🏠 Back to Home</button>
 
     <!-- Link to Sidebar CSS -->
     <link rel="stylesheet" href="../assets/css/sidebar.css">
+
+     <!-- Add Bootstrap for layout and styling -->
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0-alpha1/dist/css/bootstrap.min.css" rel="stylesheet">
+    <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0-beta3/css/all.min.css" rel="stylesheet">
     
-    <!-- Google Fonts -->
-    <link rel="preconnect" href="https://fonts.googleapis.com">
-    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-    <link href="https://fonts.googleapis.com/css2?family=Roboto:wght@300;400;500;700&family=Montserrat:wght@500;600;700&display=swap" rel="stylesheet">
-    
+   
     <style>
         :root {
             --primary-color: #1a5fb4;
@@ -365,12 +362,43 @@
                 font-size: 20px;
             }
         }
+
+        .silks-cell {
+    width: 40px;
+    text-align: center;
+}
+
+.silks-image {
+    width: 52px;
+    height: 52px;
+    object-fit: contain;
+    display: block;
+    margin: 0 auto;
+}
+
+.no-silks {
+    font-size: 12px;
+    color: #999;
+    text-align: center;
+}
+
+/* If you want a hover effect to show larger silks */
+.silks-cell:hover .silks-image {
+    position: absolute;
+    width: 64px;
+    height: 64px;
+    z-index: 100;
+    transform: translateX(-16px) translateY(-16px);
+    border: 1px solid #ccc;
+    background-color: white;
+    box-shadow: 0 2px 5px rgba(0,0,0,0.2);
+}
     </style>
 </head>
 <body>
     <header>
         <div class="container">
-            <h1>Horse Racing Cards</h1>
+            <h1> Race Cards</h1>
             <p>Race cards for today's racing - <span id="today-date"></span></p>
         </div>
     </header>
@@ -381,9 +409,9 @@
         </div>
     </div>
 
+    <?php include_once "../includes/sidebar.php"; ?>
 
 
-    
     <script>
         // Display today's date
         const today = new Date();
@@ -401,13 +429,6 @@
     <!-- Link to sidebar JavaScript -->
     <script src="../assets/js/sidebar.js"></script>
 
-
-<!-- Remove this once sidebar is sorted -->
-    <script>
-  function goHome() {
-    window.location.href = "../dashboard/index.php"; // Change this to your homepage URL if needed
-  }
-</script>
 
 </body>
 </html>
