@@ -1,4 +1,3 @@
-
 <!DOCTYPE html>
 <html lang="en">
 <head>
@@ -6,95 +5,82 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Horse Tracker</title>
     <meta name="description" content="Track your favorite race horses and receive notifications for upcoming races">
-    <link rel="stylesheet" href="assets/css/horse-tracker.css">
-    <link rel="stylesheet" href="../assets/css/sidebar.css">
-    <link rel="stylesheet" href="assets/css/horse-tracker.css">
-    
-     <!-- Add Bootstrap for layout and styling -->
-     <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0-alpha1/dist/css/bootstrap.min.css" rel="stylesheet">
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0-alpha1/dist/css/bootstrap.min.css" rel="stylesheet">
     <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0-beta3/css/all.min.css" rel="stylesheet">
+
+    <!-- Link to Racecard CSS -->
+    <link rel="stylesheet" href="assets/css/horse_tracker.css">
     
+    <style>
+       
+    </style>
 </head>
+
+<?php include_once "../includes/menu_bar.php"; ?>
+
 <body>
     <div class="container">
         <header>
             <h1>Horse Tracker</h1>
-            <p>Track your favorite race horses and receive notifications for their next races</p>
+            <p>Track your favorite race horses and receive notifications for upcoming races</p>
         </header>
 
         <main>
-            <!-- Add a button to open the modal -->
-<div class="add-horse-button-container">
-    <button id="open-add-horse-modal" class="btn">Add New Horse</button>
-</div>
-
-<!-- Convert the add-horse-section to a modal -->
-<div id="add-horse-modal" class="modal">
-    <div class="modal-content">
-        <span class="close-add-modal">&times;</span>
-        <h2>Add New Horse</h2>
-        <form id="add-horse-form">
-            <!-- Your existing form fields remain the same -->
-            <div class="form-group">
-                <label for="horse-name">Horse Name:</label>
-                <input type="text" id="horse-name" required>
-            </div>
-            <div class="form-group">
-                <label for="trainer">Trainer:</label>
-                <input type="text" id="trainer">
-            </div>
-            <div class="form-group">
-                <label for="jockey">Jockey:</label>
-                <input type="text" id="jockey">
-            </div>
-            <div class="form-group">
-                <label for="next-race-date">Next Race Date:</label>
-                <input type="datetime-local" id="next-race-date">
-            </div>
-            <div class="form-group">
-                <label for="race-location">Race Location:</label>
-                <input type="text" id="race-location">
-            </div>
-            <div class="form-group">
-                <label for="last-run-notes">Last Run Notes:</label>
-                <textarea id="last-run-notes" rows="4"></textarea>
-            </div>
-            <div class="form-group">
-                <label for="notification">Notify for next race:</label>
-                <input type="checkbox" id="notification" checked>
-            </div>
-            <button type="submit" class="btn">Add Horse</button>
-        </form>
-    </div>
-</div>
-
-            <section class="tracked-horses-section">
-                <h2>Tracked Horses</h2>
-                <div class="filters">
-                    <input type="text" id="search-horses" placeholder="Search horses...">
-                    <select id="sort-by">
-                        <option value="name">Sort by Name</option>
-                        <option value="date">Sort by Next Race Date</option>
-                        <option value="trainer">Sort by Trainer</option>
-                        <option value="added">Sort by Date Added</option>
-                    </select>
+            <div class="horse-list-section">
+                <div class="list-controls">
+                    <div class="filters">
+                        <input type="text" id="search-horses" placeholder="Search horses...">
+                        <select id="sort-by">
+                            <option value="name">Sort by Name</option>
+                            <option value="date">Sort by Next Race Date</option>
+                            <option value="added">Sort by Date Added</option>
+                        </select>
+                    </div>
+                    <div class="data-actions">
+                        <button id="add-horse-btn" class="btn"><i class="fas fa-plus"></i> Add Horse</button>
+                        <button id="view-calendar" class="btn secondary-btn"><i class="fas fa-calendar"></i> Calendar</button>
+                    </div>
                 </div>
-                <div class="data-management">
-                    <button id="export-data" class="btn secondary-btn">Export Data</button>
-                    <button id="import-data" class="btn secondary-btn">Import Data</button>
-                    <input type="file" id="import-file" accept=".json" style="display: none;">
-                    <button id="view-calendar" class="btn secondary-btn">View Calendar</button>
+                
+                <div id="horses-list">
+                    <!-- Sample horse item (will be generated by JS) -->
+                    <div class="horse-item">
+                        <div class="horse-header">
+                            <h3>Midnight Thunder</h3>
+                            <div class="race-date">Next race: Apr 20, 2025</div>
+                        </div>
+                        <div class="horse-details">
+                            <div>
+                                <p><strong>Race Location:</strong> Churchill Downs</p>
+                                <div class="notes-section">
+                                    <h4>Last Run Notes:</h4>
+                                    <p>Strong finish in the final stretch. Needs to improve starting position.</p>
+                                </div>
+                                <div class="notification-toggle">
+                                    <span>Notify for next race:</span>
+                                    <label class="switch">
+                                        <input type="checkbox" checked>
+                                        <span class="slider"></span>
+                                    </label>
+                                </div>
+                                <div class="action-buttons">
+                                    <button class="btn edit-btn"><i class="fas fa-edit"></i> Edit</button>
+                                    <button class="btn results-btn"><i class="fas fa-trophy"></i> Results</button>
+                                    <button class="btn delete-btn"><i class="fas fa-trash"></i> Delete</button>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                    
+                    <!-- Additional horse items will be added by JavaScript -->
                 </div>
-                <div id="horses-container">
-                    <!-- Horses will be populated here by JavaScript -->
-                </div>
-            </section>
+            </div>
             
-            <!-- New Calendar Section -->
+            <!-- Calendar Section (Hidden by default) -->
             <section class="calendar-section" style="display: none;">
                 <h2>Race Calendar</h2>
                 <div id="calendar-container">
-                    <!-- Calendar will be populated here by JavaScript -->
+                    <!-- Calendar will be populated by JavaScript -->
                 </div>
             </section>
         </main>
@@ -104,52 +90,90 @@
         </footer>
     </div>
 
-    <!-- Notification modal -->
-    <div id="notification-modal" class="modal">
+    <!-- Add Horse Modal -->
+    <div id="add-horse-modal" class="modal">
         <div class="modal-content">
             <span class="close-modal">&times;</span>
-            <h2>Upcoming Races</h2>
-            <div id="upcoming-races-list"></div>
-        </div>
-    </div>
-    
-    <!-- Race Results Modal -->
-    <div id="race-results-modal" class="modal">
-        <div class="modal-content">
-            <span class="close-modal">&times;</span>
-            <h2>Race Results for <span id="results-horse-name"></span></h2>
-            <div id="race-results-list"></div>
-            
-            <!-- Add New Result Form -->
-            <form id="add-result-form">
-                <h3>Add Race Result</h3>
+            <h2>Add New Horse</h2>
+            <form id="add-horse-form">
                 <div class="form-group">
-                    <label for="result-date">Race Date:</label>
-                    <input type="date" id="result-date" required>
+                    <label for="horse-name">Horse Name:</label>
+                    <input type="text" id="horse-name" required>
                 </div>
                 <div class="form-group">
-                    <label for="result-position">Position:</label>
-                    <input type="number" id="result-position" min="1" required>
+                    <label for="race-location">Race Location:</label>
+                    <input type="text" id="race-location">
                 </div>
                 <div class="form-group">
-                    <label for="result-venue">Venue:</label>
-                    <input type="text" id="result-venue">
+                    <label for="last-run-notes">Last Run Notes:</label>
+                    <textarea id="last-run-notes" rows="4"></textarea>
                 </div>
                 <div class="form-group">
-                    <label for="result-notes">Notes:</label>
-                    <textarea id="result-notes" rows="3"></textarea>
+                    <label for="notification">
+                        <input type="checkbox" id="notification" checked>
+                        Notify for next race
+                    </label>
                 </div>
-                <button type="submit" class="btn">Add Result</button>
+                <button type="submit" class="btn">Save Horse</button>
             </form>
         </div>
     </div>
 
-    <?php include_once "../includes/sidebar.php"; ?>
-    <?php include_once "../includes/footer.php"; ?>
+    
 
-    <script src="assets/js/add-horse.js"></script>
-  
+    <script>
+        document.addEventListener('DOMContentLoaded', function() {
+            // Toggle horse details when clicking on header
+            const horseHeaders = document.querySelectorAll('.horse-header');
+            horseHeaders.forEach(header => {
+                header.addEventListener('click', function() {
+                    const details = this.nextElementSibling;
+                    details.classList.toggle('active');
+                });
+            });
 
-    <script src="../assets/js/sidebar.js"></script>
+            // Modal functionality
+            const addHorseBtn = document.getElementById('add-horse-btn');
+            const addHorseModal = document.getElementById('add-horse-modal');
+            const closeButtons = document.querySelectorAll('.close-modal');
+
+            addHorseBtn.addEventListener('click', function() {
+                addHorseModal.style.display = 'block';
+            });
+
+            closeButtons.forEach(button => {
+                button.addEventListener('click', function() {
+                    this.closest('.modal').style.display = 'none';
+                });
+            });
+
+            // Close modal when clicking outside
+            window.addEventListener('click', function(event) {
+                if (event.target.classList.contains('modal')) {
+                    event.target.style.display = 'none';
+                }
+            });
+
+            // Calendar toggle
+            const calendarBtn = document.getElementById('view-calendar');
+            const horseListSection = document.querySelector('.horse-list-section');
+            const calendarSection = document.querySelector('.calendar-section');
+
+            calendarBtn.addEventListener('click', function() {
+                if (calendarSection.style.display === 'none') {
+                    horseListSection.style.display = 'none';
+                    calendarSection.style.display = 'block';
+                    calendarBtn.innerHTML = '<i class="fas fa-list"></i> List View';
+                } else {
+                    calendarSection.style.display = 'none';
+                    horseListSection.style.display = 'block';
+                    calendarBtn.innerHTML = '<i class="fas fa-calendar"></i> Calendar';
+                }
+            });
+
+            // Here you would add code to handle form submissions, filtering, sorting, etc.
+        });
+    </script>
 </body>
 </html>
+

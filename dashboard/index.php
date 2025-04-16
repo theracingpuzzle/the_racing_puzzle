@@ -118,23 +118,27 @@
                         </div>
                     </div>
                 </div>
-                <div class="col-md-3 mb-3">
-                    <div class="card h-100 border-0 shadow-sm stats-card">
-                        <div class="card-body">
-                            <div class="d-flex justify-content-between align-items-center">
-                                <div>
-                                    <h6 class="text-muted mb-2">Tracker</h6>
-                                    <h3 class="mb-0">15</h3>
-                                    <small class="text-success"><i class="fas fa-unlock me-1"></i> 2 new unlocked</small>
-                                </div>
-                                <div class="icon-box bg-info-light">
-                                    <i class="fas fa-medal fa-lg text-info"></i>
-                                </div>
-                            </div>
-                        </div>
-                    </div>
+
+                <?php include 'tracker-stats.php'; ?>
+
+<div class="col-md-3 mb-3">
+    <div class="card h-100 border-0 shadow-sm stats-card">
+        <div class="card-body">
+            <div class="d-flex justify-content-between align-items-center">
+                <div>
+                    <h6 class="text-muted mb-2">Tracker</h6>
+                    <h3 class="mb-0"><?= htmlspecialchars($stats['total']) ?></h3>
+<small class="text-muted">Total tracked horses</small>
+
+                </div>
+                <div class="icon-box bg-info-light">
+                    <i class="fas fa-medal fa-lg text-info"></i>
                 </div>
             </div>
+        </div>
+    </div>
+</div>
+
             
             <!-- Main Dashboard Content -->
             <div class="row">

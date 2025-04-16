@@ -4,7 +4,7 @@
 document.addEventListener('DOMContentLoaded', function() {
     // Fetch the JSON data
     // In production, replace this URL with the path to your actual JSON file
-    fetch('../racecards/assets/js/2025-04-09.json')
+    fetch('../racecards/assets/js/2025-04-15.json')
         .then(response => response.json())
         .then(data => {
             // Process the data
@@ -143,6 +143,7 @@ function createRaceCard(race, raceTime) {
             <th>Trainer</th>
             <th>Form</th>
             <th>Comment</th>
+            <th>Tracker</th>
         </tr>
     `;
     runnersTable.appendChild(tableHeader);
@@ -191,6 +192,12 @@ function createRaceCard(race, raceTime) {
             <td>${runner.trainer}</td>
             <td>${runner.form || '-'}</td>
             <td class="comment">${runner.comment || ''}</td>
+            <td class="tracker-cell">
+            <button class="tracker-btn" title="Add to tracker" 
+    onclick="openQuickTracker('${runner.name}', '${runner.jockey || ''}', '${runner.trainer || ''}')">
+    🔍
+</button>
+        </td>
         `;
         
         tableBody.appendChild(row);

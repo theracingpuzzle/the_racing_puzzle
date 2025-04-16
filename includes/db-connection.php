@@ -22,10 +22,6 @@ try {
     // Enable foreign keys support
     $conn->exec('PRAGMA foreign_keys = ON;');
 
-    // Test writing
-    $conn->exec("CREATE TABLE IF NOT EXISTS test (id INTEGER PRIMARY KEY)");
-
-    echo "Database connection successful & write test passed!";
 } catch (PDOException $e) {
     die("Database connection failed: " . $e->getMessage());
 }
