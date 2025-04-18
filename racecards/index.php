@@ -35,6 +35,12 @@
     </div>
 
     <!-- Add this HTML to your main page where the race cards are displayed -->
+<!-- Button to open modal -->
+<!-- <button type="button" onclick="openQuickTracker('', '', '')" class="btn">
+    <i class="fas fa-plus"></i> Add to Tracker
+</button> -->
+
+<!-- The Modal -->
 <div id="quick-tracker-modal" class="modal">
     <div class="modal-content">
         <span class="close-quick-tracker">&times;</span>
@@ -62,10 +68,11 @@
                     Notify me about this horse's races
                 </label>
             </div>
-            <button type="submit" class="btn">Add to Tracker</button>
+            <button type="submit" class="btn">Save Horse</button>
         </form>
     </div>
 </div>
+
 
     <?php include_once "../includes/sidebar.php"; ?>
 

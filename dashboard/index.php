@@ -63,9 +63,7 @@
                     <h2 class="mb-1">Dashboard Overview</h2>
                     <p class="text-muted">Welcome back, Dan! Here's your racing performance summary.</p>
                 </div>
-                <button class="btn btn-primary d-flex align-items-center">
-                    <i class="fas fa-plus me-2"></i> New Entry
-                </button>
+                
             </div>
             
             <!-- Stats Cards -->
@@ -102,22 +100,29 @@
                         </div>
                     </div>
                 </div>
+                
+                <?php include 'best-racecourse-stats.php'; ?>
+
+
                 <div class="col-md-3 mb-3">
-                    <div class="card h-100 border-0 shadow-sm stats-card">
-                        <div class="card-body">
-                            <div class="d-flex justify-content-between align-items-center">
-                                <div>
-                                    <h6 class="text-muted mb-2">Earnings</h6>
-                                    <h3 class="mb-0">1,287</h3>
-                                    <small class="text-success"><i class="fas fa-arrow-up me-1"></i> 87 new points</small>
-                                </div>
-                                <div class="icon-box bg-warning-light">
-                                    <i class="fas fa-star fa-lg text-warning"></i>
-                                </div>
-                            </div>
-                        </div>
-                    </div>
+    <div class="card h-100 border-0 shadow-sm stats-card">
+        <div class="card-body">
+            <div class="d-flex justify-content-between align-items-center">
+                <div>
+                    <h6 class="text-muted mb-2">Top Racecourse</h6>
+                    <h4 class="mb-0">
+                        <?= htmlspecialchars($bestCourse['racecourse'] ?? 'N/A') ?>
+                    </h4>
+                    <small class="text-muted"><?= $bestCourse['wins'] ?? 0 ?> wins</small>
                 </div>
+                <div class="icon-box bg-success-light">
+                    <i class="fas fa-trophy fa-lg text-success"></i>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+
 
                 <?php include 'tracker-stats.php'; ?>
 

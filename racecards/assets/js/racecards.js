@@ -4,7 +4,7 @@
 document.addEventListener('DOMContentLoaded', function() {
     // Fetch the JSON data
     // In production, replace this URL with the path to your actual JSON file
-    fetch('../racecards/assets/js/2025-04-15.json')
+    fetch('../racecards/assets/js/2025-04-18.json')
         .then(response => response.json())
         .then(data => {
             // Process the data
