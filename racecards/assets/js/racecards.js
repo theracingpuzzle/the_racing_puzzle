@@ -4,7 +4,7 @@
 document.addEventListener('DOMContentLoaded', function() {
     // Fetch the JSON data
     // In production, replace this URL with the path to your actual JSON file
-    fetch('../racecards/assets/js/2025-04-18.json')
+    fetch('../racecards/assets/js/2025-04-19.json')
         .then(response => response.json())
         .then(data => {
             // Process the data
@@ -98,13 +98,18 @@ function createRaceCard(race, raceTime) {
         <h3>${race.course} ${formattedTime}</h3>
         <h4>${race.race_name}</h4>
     `;
+
+    // Gives me the date in English format
+    const originalDate = new Date(race.date);
+const formattedDate = `${originalDate.getDate().toString().padStart(2, '0')}/${(originalDate.getMonth() + 1).toString().padStart(2, '0')}/${originalDate.getFullYear()}`;
+
     
     // Create race info
     const raceInfo = document.createElement('div');
     raceInfo.className = 'race-info';
     raceInfo.innerHTML = `
         <div>
-            <p><strong>Date:</strong> ${race.date}</p>
+        <p><strong>Date:</strong> ${formattedDate}</p>
             <p><strong>Distance:</strong> ${race.distance_round} (${race.distance})</p>
             <p><strong>Type:</strong> ${race.type}</p>
         </div>
