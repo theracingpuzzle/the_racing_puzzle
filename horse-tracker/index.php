@@ -34,7 +34,10 @@
                     </div>
                     <div class="data-actions">
                         <button id="add-horse-btn" class="btn"><i class="fas fa-plus"></i> Add Horse</button>
-                        <button id="view-calendar" class="btn secondary-btn"><i class="fas fa-calendar"></i> Calendar</button>
+                        <button id="view-calendar" class="btn secondary-btn" onclick="window.location.href='../calendar/index.php'">
+  <i class="fas fa-calendar"></i> Calendar
+</button>
+
                     </div>
                 </div>
                 

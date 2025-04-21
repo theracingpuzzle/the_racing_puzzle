@@ -399,12 +399,12 @@ $racecourses = fetchRacecourses();
                             <div class="col-md-4">
                                 <label for="jockey" class="form-label">Jockey</label>
                                 <input type="text" class="form-control" id="jockey" name="jockey" required>
-                                <div class="invalid-feedback">Please enter jockey name</div>
+                                <div class="invalid-feedback">Please enter Jockey name</div>
                             </div>
                             <div class="col-md-4">
                                 <label for="trainer" class="form-label">Trainer</label>
                                 <input type="text" class="form-control" id="trainer" name="trainer" required>
-                                <div class="invalid-feedback">Please enter trainer name</div>
+                                <div class="invalid-feedback">Please enter Trainer name</div>
                             </div>
                         </div>
                         <div class="row mb-3">

@@ -237,17 +237,21 @@ function convertPoundsToStonesPounds(pounds) {
 
 // Helper function to format race time (24-hour to 12-hour)
 function formatRaceTime(timeString) {
-    // Check if the time already has AM or PM
-    if (timeString.match(/\d{1,2}:\d{2} (AM|PM)/i)) {
-        return timeString; // Already in 12-hour format, return as is
+    let [hours, minutes] = timeString.split(':').map(Number);
+
+    // Assume PM for all times before 12 (typical for afternoon races)
+    if (hours < 12) {
+        hours += 12;
     }
 
-    // Otherwise, assume it's in 12-hour format but missing AM/PM
-    const [hours, minutes] = timeString.split(':');
-    const hour = parseInt(hours, 10);
+    const date = new Date();
+    date.setHours(hours, minutes);
 
-    // Determine AM/PM based on a reasonable assumption (e.g., morning races)
-    const ampm = hour >= 1 && hour < 12 ? 'AM' : 'PM';
+    const options = { hour: 'numeric', minute: '2-digit', hour12: true };
+    let formatted = date.toLocaleTimeString('en-GB', options);
 
-    return `${hour}:${minutes} ${ampm}`;
+    // Force uppercase AM/PM
+    return formatted.replace(/am|pm/i, match => match.toUpperCase());
 }
+
+

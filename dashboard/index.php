@@ -1,3 +1,26 @@
+<?php
+// dashboard.php - User dashboard after login
+require_once 'auth.php';
+
+// Check if user is logged in
+if (!isLoggedIn()) {
+    header('Location: login.php');
+    exit;
+}
+
+// Get user data from session
+$user_id = $_SESSION['user_id'];
+$username = $_SESSION['username'];
+$display_name = isset($_SESSION['display_name']) ? $_SESSION['display_name'] : $username;
+
+// Get additional user data from database if needed
+global $conn;
+$stmt = $conn->prepare("SELECT * FROM user_profiles WHERE user_id = ?");
+$stmt->execute([$user_id]);
+$profile = $stmt->fetch(PDO::FETCH_ASSOC);
+
+?>
+
 <!DOCTYPE html>
 <html lang="en">
 <head>
@@ -84,22 +107,30 @@
                         </div>
                     </div>
                 </div>
-                <div class="col-md-3 mb-3">
-                    <div class="card h-100 border-0 shadow-sm stats-card">
-                        <div class="card-body">
-                            <div class="d-flex justify-content-between align-items-center">
-                                <div>
-                                    <h6 class="text-muted mb-2">Win Rate</h6>
-                                    <h3 class="mb-0">32%</h3>
-                                    <small class="text-success"><i class="fas fa-arrow-up me-1"></i> 5% from last month</small>
-                                </div>
-                                <div class="icon-box bg-success-light">
-                                    <i class="fas fa-trophy fa-lg text-success"></i>
-                                </div>
-                            </div>
-                        </div>
-                    </div>
-                </div>
+
+                <?php include 'best-jockey-stats.php'; ?>
+
+<div class="col-md-4 mb-3">
+    <div class="card h-100 border-0 shadow-sm stats-card">
+        <div class="card-body">
+            <h6 class="text-muted mb-3">Top Jockeys</h6>
+            <?php if (!empty($topJockeys)): ?>
+                <ol class="pl-3 mb-0">
+                    <?php foreach ($topJockeys as $jockey): ?>
+                        <li class="mb-1 d-flex justify-content-between">
+                            <span><?= htmlspecialchars($jockey['jockey']) ?></span>
+                            <small class="text-muted"><?= $jockey['wins'] ?> wins</small>
+                        </li>
+                    <?php endforeach; ?>
+                </ol>
+            <?php else: ?>
+                <p class="text-muted mb-0">No data available.</p>
+            <?php endif; ?>
+        </div>
+    </div>
+</div>
+
+
                 
                 <?php include 'best-racecourse-stats.php'; ?>
 
