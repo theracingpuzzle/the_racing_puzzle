@@ -4,7 +4,7 @@ require_once 'auth.php';
 
 // Check if already logged in
 if (isLoggedIn()) {
-    header('Location: dashboard2.php');
+    header('Location: ../dashboard');
     exit;
 }
 

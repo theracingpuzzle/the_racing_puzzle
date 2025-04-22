@@ -1,5 +1,11 @@
 <?php
 
+// dashboard/index.php
+require_once '../user-management/auth.php'; // Adjust path as needed
+requireLogin();
+
+// Continue with the rest of your dashboard code
+
 // Database connection
 require_once "../includes/db-connection.php"; // This will now use your SQLite connection
 
@@ -150,80 +156,76 @@ $racecourses = fetchRacecourses();
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Bet Records</title>
-    <link href="https://cdnjs.cloudflare.com/ajax/libs/bootstrap/5.3.0/css/bootstrap.min.css" rel="stylesheet">
     <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0-beta3/css/all.min.css" rel="stylesheet">
-    <link rel="stylesheet" href="assets/css/bet-record.css">
-
-    <link rel="stylesheet" href="../assets/css/sidebar.css">
+    <link href="https://fonts.googleapis.com/css2?family=Montserrat:wght@400;500;600;700&family=Playfair+Display:wght@700&family=Roboto+Mono&family=Source+Sans+Pro:wght@400;600&display=swap" rel="stylesheet">
+    <!-- Main CSS File -->
+    <link rel="stylesheet" href="../assets/css/main.css">
+    <!-- Additional CSS for bet records page -->
+    <!-- <link rel="stylesheet" href="assets/css/bet-record.css"> -->
+   
 </head>
+
+<?php include '../test/app-header.php'; ?>
+
 <body>
-    <div class="container mt-5">
-        <div class="row mb-4">
-            <div class="col-md-12 d-flex justify-content-between align-items-center">
+    <div class="container mt-20">
+        <div class="card mb-20">
+            <div class="card-header">
                 <h2>Bet Records</h2>
-                <div>
-                    <button type="button" class="btn btn-primary me-2" data-bs-toggle="modal" data-bs-target="#addBetModal">
+                <div class="d-flex gap-10">
+                    <button type="button" class="btn btn-primary" data-bs-toggle="modal" data-bs-target="#addBetModal">
                         <i class="fas fa-plus"></i> Add New Bet
                     </button>
                     <button type="button" class="btn btn-secondary" onclick="toggleStats()">
                         <i class="fas fa-chart-line"></i> Toggle Stats
                     </button>
-                    <button type="button" class="btn btn-success ms-2" onclick="exportToCSV()">
+                    <button type="button" class="btn btn-primary" onclick="exportToCSV()">
                         <i class="fas fa-file-export"></i> Export CSV
                     </button>
-                    
                 </div>
             </div>
-        </div>
-        
-        <?php if(isset($success_message)): ?>
-            <div class="alert alert-success"><?php echo $success_message; ?></div>
-        <?php endif; ?>
-        <?php if(isset($error_message)): ?>
-            <div class="alert alert-danger"><?php echo $error_message; ?></div>
-        <?php endif; ?>
-        
-        <!-- Stats Section -->
-        <div id="statsContainer" class="row mb-4">
-            <div class="col-md-3">
-                <div class="stats-card total">
-                    <div class="stats-value"><?php echo $stats['total']; ?></div>
-                    <div class="stats-label">Total Bets</div>
+            
+            <?php if(isset($success_message)): ?>
+                <div class="alert alert-success"><?php echo $success_message; ?></div>
+            <?php endif; ?>
+            <?php if(isset($error_message)): ?>
+                <div class="alert alert-danger"><?php echo $error_message; ?></div>
+            <?php endif; ?>
+            
+            <!-- Stats Section with race-themed styling -->
+            <div id="statsContainer" class="card-body">
+                <div class="d-flex flex-wrap gap-20 mb-20">
+                    <div class="stats-card total">
+                        <div class="stats-value"><?php echo $stats['total']; ?></div>
+                        <div class="stats-label">Total Bets</div>
+                    </div>
+                    <div class="stats-card wins">
+                        <div class="stats-value"><?php echo $stats['won']; ?></div>
+                        <div class="stats-label">Wins</div>
+                    </div>
+                    <div class="stats-card losses">
+                        <div class="stats-value"><?php echo $stats['lost']; ?></div>
+                        <div class="stats-label">Losses</div>
+                    </div>
+                    <div class="stats-card pending">
+                        <div class="stats-value"><?php echo $stats['pending']; ?></div>
+                        <div class="stats-label">Pending</div>
+                    </div>
                 </div>
-            </div>
-            <div class="col-md-3">
-                <div class="stats-card wins">
-                    <div class="stats-value"><?php echo $stats['won']; ?></div>
-                    <div class="stats-label">Wins</div>
-                </div>
-            </div>
-            <div class="col-md-3">
-                <div class="stats-card losses">
-                    <div class="stats-value"><?php echo $stats['lost']; ?></div>
-                    <div class="stats-label">Losses</div>
-                </div>
-            </div>
-            <div class="col-md-3">
-                <div class="stats-card pending">
-                    <div class="stats-value"><?php echo $stats['pending']; ?></div>
-                    <div class="stats-label">Pending</div>
-                </div>
-            </div>
-            <div class="col-md-6 mt-3">
                 <div class="card">
                     <div class="card-body">
                         <h5 class="card-title">Financial Summary</h5>
-                        <div class="row">
-                            <div class="col-6">
-                                <p class="mb-1">Total Staked:</p>
+                        <div class="d-flex justify-between mb-10">
+                            <div>
+                                <p class="mb-10">Total Staked:</p>
                                 <h3 class="text-danger">£<?php echo number_format($stats['total_stake'], 2); ?></h3>
                             </div>
-                            <div class="col-6">
-                                <p class="mb-1">Total Returns:</p>
+                            <div>
+                                <p class="mb-10">Total Returns:</p>
                                 <h3 class="text-success">£<?php echo number_format($stats['total_returns'], 2); ?></h3>
                             </div>
                         </div>
-                        <div class="progress mt-2">
+                        <div class="progress mt-10">
                             <?php 
                             $win_percentage = ($stats['won'] > 0 && $stats['total'] > 0) ? ($stats['won'] / $stats['total']) * 100 : 0; 
                             ?>
@@ -237,25 +239,30 @@ $racecourses = fetchRacecourses();
         </div>
         
         <!-- Search and Filter Section -->
-        <div class="row mb-3">
-            <div class="col-md-6">
-                <div class="input-group">
-                    <span class="input-group-text"><i class="fas fa-search"></i></span>
-                    <input type="text" class="form-control" id="searchBets" placeholder="Search bets...">
-                </div>
-            </div>
-            <div class="col-md-6">
-                <div class="btn-group" role="group">
-                    <button type="button" class="btn btn-outline-secondary filter-outcome active" data-outcome="all">All</button>
-                    <button type="button" class="btn btn-outline-success filter-outcome" data-outcome="won">Won</button>
-                    <button type="button" class="btn btn-outline-danger filter-outcome" data-outcome="lost">Lost</button>
-                    <button type="button" class="btn btn-outline-warning filter-outcome" data-outcome="pending">Pending</button>
+        <div class="card mb-20">
+            <div class="card-body">
+                <div class="d-flex justify-between flex-wrap gap-10">
+                    <div class="search-container">
+                        <div class="input-group">
+                            <span class="input-group-text"><i class="fas fa-search"></i></span>
+                            <input type="text" class="form-control" id="searchBets" placeholder="Search bets...">
+                        </div>
+                    </div>
+                    <div class="filter-buttons">
+                        <div class="btn-group" role="group">
+                            <button type="button" class="btn btn-outline-secondary filter-outcome active" data-outcome="all">All</button>
+                            <button type="button" class="btn btn-outline-success filter-outcome" data-outcome="won">Won</button>
+                            <button type="button" class="btn btn-outline-danger filter-outcome" data-outcome="lost">Lost</button>
+                            <button type="button" class="btn btn-outline-warning filter-outcome" data-outcome="pending">Pending</button>
+                        </div>
+                    </div>
                 </div>
             </div>
         </div>
         
-        <div class="row">
-            <div class="col-md-12">
+        <!-- Records Table Card -->
+        <div class="card">
+            <div class="card-body">
                 <div class="table-responsive">
                     <table class="table table-striped table-hover">
                         <thead>
@@ -272,7 +279,6 @@ $racecourses = fetchRacecourses();
                                 <th>Actions</th>
                             </tr>
                         </thead>
-                        <!-- Table section in HTML -->
                         <tbody>
                             <?php if (!empty($result)): ?>
                                 <?php foreach($result as $row): ?>
@@ -291,13 +297,13 @@ $racecourses = fetchRacecourses();
                                     <td><?php echo htmlspecialchars($row['trainer']); ?></td>
                                     <td>
                                         <?php if($row['outcome'] == 'Won'): ?>
-                                            <span class="badge bg-success">Won</span>
+                                            <span class="badge badge-success">Won</span>
                                         <?php elseif($row['outcome'] == 'Lost'): ?>
-                                            <span class="badge bg-danger">Lost</span>
+                                            <span class="badge badge-danger">Lost</span>
                                         <?php elseif($row['outcome'] == 'Pending'): ?>
-                                            <span class="badge bg-warning">Pending</span>
+                                            <span class="badge badge-warning">Pending</span>
                                         <?php else: ?>
-                                            <span class="badge bg-secondary"><?php echo htmlspecialchars($row['outcome']); ?></span>
+                                            <span class="badge badge-info"><?php echo htmlspecialchars($row['outcome']); ?></span>
                                         <?php endif; ?>
                                     </td>
                                     <td>
@@ -325,13 +331,12 @@ $racecourses = fetchRacecourses();
         </div>
     </div>
 
-   <!-- Add Bet Modal -->
-   <div class="modal fade" id="addBetModal" tabindex="-1" aria-labelledby="addBetModalLabel" aria-hidden="true">
-        <div class="modal-dialog modal-lg">
+   <!-- Add Bet Modal with racing-themed styling -->
+   <div class="modal fade" id="addBetModal" tabindex="-1" >
             <div class="modal-content">
                 <div class="modal-header">
-                    <h5 class="modal-title" id="addBetModalLabel">Add New Bet</h5>
-                    <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+                    <h3 class="modal-title" id="addBetModalLabel">Add New Bet</h3>
+                    <span class="modal-close close-modal">&times;</span>
                 </div>
                 <div class="modal-body">
                     <form method="post" action="" id="betForm" class="needs-validation" novalidate>
@@ -362,33 +367,35 @@ $racecourses = fetchRacecourses();
                                 <div class="invalid-feedback">Please enter horse name</div>
                             </div>
                             <div class="col-md-6">
-    <label for="racecourse" class="form-label">Racecourse</label>
-    <select class="form-select" id="racecourse" name="racecourse" required>
-        <option value="">Select Racecourse</option>
-        <?php 
-        // Check if we got array of arrays (from racecourses table) or just values
-        if(!empty($racecourses) && isset($racecourses[0]) && is_array($racecourses[0])) {
-            foreach($racecourses as $course): ?>
-                <option value="<?php echo htmlspecialchars($course['name']); ?>">
-                    <?php echo htmlspecialchars($course['name']); ?>
-                </option>
-            <?php endforeach;
-        } else {
-            // Simple array of values
-            foreach($racecourses as $course): ?>
-                <option value="<?php echo htmlspecialchars($course); ?>">
-                    <?php echo htmlspecialchars($course); ?>
-                </option>
-            <?php endforeach;
-        } ?>
-    </select>
-    <div class="invalid-feedback">Please select a racecourse</div>
-    
-    <!-- This input will appear when "Other" is selected -->
-    <div id="newRacecourseContainer" class="mt-2 d-none">
-        <input type="text" class="form-control" id="newRacecourse" placeholder="Enter new racecourse">
-    </div>
-</div>
+                                <label for="racecourse" class="form-label">Racecourse</label>
+                                <select class="form-select" id="racecourse" name="racecourse" required>
+                                    <option value="">Select Racecourse</option>
+                                    <?php 
+                                    // Check if we got array of arrays (from racecourses table) or just values
+                                    if(!empty($racecourses) && isset($racecourses[0]) && is_array($racecourses[0])) {
+                                        foreach($racecourses as $course): ?>
+                                            <option value="<?php echo htmlspecialchars($course['name']); ?>">
+                                                <?php echo htmlspecialchars($course['name']); ?>
+                                            </option>
+                                        <?php endforeach;
+                                    } else {
+                                        // Simple array of values
+                                        foreach($racecourses as $course): ?>
+                                            <option value="<?php echo htmlspecialchars($course); ?>">
+                                                <?php echo htmlspecialchars($course); ?>
+                                            </option>
+                                        <?php endforeach;
+                                    } ?>
+                                    <option value="other">Other (Add New)</option>
+                                </select>
+                                <div class="invalid-feedback">Please select a racecourse</div>
+                                
+                                <!-- This input will appear when "Other" is selected -->
+                                <div id="newRacecourseContainer" class="mt-2 d-none">
+                                    <input type="text" class="form-control" id="newRacecourse" placeholder="Enter new racecourse">
+                                    <input type="hidden" name="new_racecourse" id="new_racecourse" value="0">
+                                </div>
+                            </div>
                         </div>
                         <div class="row mb-3">
                             <div class="col-md-4">
@@ -438,12 +445,104 @@ $racecourses = fetchRacecourses();
         </div>
     </div>
 
-    <?php include_once "../includes/sidebar.php"; ?>
+    <?php include '../test/bottom-nav.php'; ?>
 
-    <!-- Link to sidebar JavaScript -->
-<script src="../assets/js/sidebar.js"></script>
 
     <script src="https://cdnjs.cloudflare.com/ajax/libs/bootstrap/5.3.0/js/bootstrap.bundle.min.js"></script>
     <script src="assets/js/bet-record.js"></script>
+    
+    <script>
+    // Script to handle new racecourse entry
+    document.addEventListener('DOMContentLoaded', function() {
+        const racecourseSelect = document.getElementById('racecourse');
+        const newRacecourseContainer = document.getElementById('newRacecourseContainer');
+        const newRacecourseInput = document.getElementById('newRacecourse');
+        const newRacecourseFlag = document.getElementById('new_racecourse');
+        const closeButtons = document.querySelectorAll('.close-modal');
+        
+        racecourseSelect.addEventListener('change', function() {
+            if (this.value === 'other') {
+                newRacecourseContainer.classList.remove('d-none');
+                newRacecourseFlag.value = '1';
+                newRacecourseInput.required = true;
+                
+                // When "Other" is selected, we'll use the value from the new input field
+                newRacecourseInput.addEventListener('input', function() {
+                    racecourseSelect.value = newRacecourseInput.value;
+                });
+            } else {
+                newRacecourseContainer.classList.add('d-none');
+                newRacecourseFlag.value = '0';
+                newRacecourseInput.required = false;
+            }
+        });
+        
+        // Calculate potential returns when stake or odds change
+        const stakeInput = document.getElementById('stake');
+        const oddsInput = document.getElementById('odds');
+        const potentialReturnsDisplay = document.getElementById('potentialReturns');
+        const outcomeSelect = document.getElementById('outcome');
+        
+        function calculateReturns() {
+            const stake = parseFloat(stakeInput.value) || 0;
+            const odds = oddsInput.value;
+            let returns = 0;
+            
+            if (odds && stake > 0) {
+                if (odds.includes('/')) {
+                    const [numerator, denominator] = odds.split('/');
+                    returns = stake + (stake * parseFloat(numerator) / parseFloat(denominator));
+                } else {
+                    returns = stake * parseFloat(odds);
+                }
+            }
+            
+            potentialReturnsDisplay.textContent = returns.toFixed(2);
+        }
+        
+        stakeInput.addEventListener('input', calculateReturns);
+        oddsInput.addEventListener('input', calculateReturns);
+    });
+    
+    // Toggle stats section visibility
+    function toggleStats() {
+        const statsContainer = document.getElementById('statsContainer');
+        if (statsContainer.style.display === 'none') {
+            statsContainer.style.display = 'block';
+        } else {
+            statsContainer.style.display = 'none';
+        }
+    }
+    
+    // Export table data to CSV
+    function exportToCSV() {
+        const table = document.querySelector('table');
+        let csv = [];
+        const rows = table.querySelectorAll('tr');
+        
+        for (let i = 0; i < rows.length; i++) {
+            const row = [], cols = rows[i].querySelectorAll('td, th');
+            
+            for (let j = 0; j < cols.length; j++) {
+                // Get the text content and remove any commas
+                let data = cols[j].textContent.replace(/,/g, ' ');
+                // Remove the actions column content
+                if (j === cols.length - 1 && i > 0) data = '';
+                row.push('"' + data + '"');
+            }
+            
+            csv.push(row.join(','));
+        }
+        
+        // Download CSV file
+        const csvFile = new Blob([csv.join('\n')], {type: 'text/csv'});
+        const downloadLink = document.createElement('a');
+        downloadLink.download = 'bet_records_' + new Date().toISOString().slice(0,10) + '.csv';
+        downloadLink.href = window.URL.createObjectURL(csvFile);
+        downloadLink.style.display = 'none';
+        document.body.appendChild(downloadLink);
+        downloadLink.click();
+    }
+    </script>
 </body>
 </html>

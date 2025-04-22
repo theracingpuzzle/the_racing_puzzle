@@ -63,6 +63,35 @@
     </table>
 </div>
 
+    <!-- Quick Tracker Modal -->
+    <div id="quick-tracker-modal" class="modal">
+    <div class="modal-content">
+        <div class="modal-header">
+            <h2>Add Horse to Tracker</h2>
+            <span class="close-quick-tracker">&times;</span>
+        </div>
+        <form id="quick-tracker-form">
+            <div class="form-group">
+                <label for="quick-horse-name">Horse Name</label>
+                <input type="text" id="quick-horse-name" name="quick-horse-name" required>
+            </div>
+            <div class="form-group">
+                <label for="quick-trainer">Trainer</label>
+                <input type="text" id="quick-trainer" name="quick-trainer">
+            </div>
+            <div class="form-group">
+                <label for="quick-notes">Notes</label>
+                <textarea id="quick-notes" name="quick-notes" rows="4"></textarea>
+            </div>
+            <div class="form-actions">
+                <button type="submit" class="btn btn-primary">Add to Tracker</button>
+                <button type="button" class="btn btn-secondary close-quick-tracker">Cancel</button>
+            </div>
+        </form>
+    </div>
+</div>
+
+
 <style>
 /* Table View Styling */
 .runners-table {

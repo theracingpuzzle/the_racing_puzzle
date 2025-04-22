@@ -47,7 +47,7 @@ $currentDirectory = basename(dirname($_SERVER['PHP_SELF']));
             </div>
             
             <div class="nav-item">
-                <a href="../racecards" class="<?php echo ($currentDirectory == 'racecards') ? 'active' : ''; ?>">
+                <a href="../race-cards" class="<?php echo ($currentDirectory == 'race-cards') ? 'active' : ''; ?>">
                     <i class="fa-solid fa-newspaper"></i>
                     <span class="nav-text">Racecards</span>
                 </a>

@@ -1,11 +1,3 @@
-<?php
-// dashboard/index.php
-require_once '../user-management/auth.php'; // Adjust path as needed
-requireLogin();
-
-// Continue with the rest of your dashboard code
-?>
-
 <!DOCTYPE html>
 <html lang="en">
 <head>
@@ -14,20 +6,38 @@ requireLogin();
     <title>Horse Racing Cards - Redesigned</title>
     <link href="https://fonts.googleapis.com/css2?family=Montserrat:wght@400;500;600;700&family=Playfair+Display:wght@700&family=Roboto+Mono&family=Source+Sans+Pro:wght@400;600&display=swap" rel="stylesheet">
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    <link rel="stylesheet" href="racecard2.css">
+
     <!-- Link to main.css instead of horse_tracker.css -->
     <link rel="stylesheet" href="../assets/css/main.css">
-    
-    <link rel="stylesheet" href="racecard2.css">
-    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/flag-icon-css/3.5.0/css/flag-icon.min.css" />
-
-
        
 </head>
 <body>
     <?php include 'race-data.php'; ?>
 
-    <?php include '../test/app-header.php'; ?>
+    <!-- New App Header -->
+    <header class="app-header">
+        <div class="container">
+            <div class="header-content">
+            <div class="logo-container">
+    <img src="../assets/images/logo.png" alt="Race Cards Logo">
+    <h1>Race Cards</h1>
+</div>
 
+                <div class="header-actions">
+                    <button class="action-button" title="Notifications">
+                        <i class="fas fa-bell"></i>
+                    </button>
+                    <button class="action-button" title="My Tracker">
+                        <i class="fas fa-star"></i>
+                    </button>
+                    <button class="action-button primary" title="Quick Add to Tracker">
+                        <i class="fas fa-plus"></i>
+                    </button>
+                </div>
+            </div>
+        </div>
+    </header>
 
     <!-- Date Navigation -->
     <div class="date-navigation">
@@ -63,13 +73,16 @@ requireLogin();
                     <i class="fas fa-globe"></i> All
                 </button>
                 <button class="filter-button">
-                <span class="flag-icon flag-icon-gb"></span> UK
+                    <i class="fas fa-leaf"></i> Flat
                 </button>
                 <button class="filter-button">
-                    <i class="flag-icon flag-icon-ie"></i> Ireland
+                    <i class="fas fa-mountain"></i> All Weather
                 </button>
                 <button class="filter-button">
-                    <i class="flag-icon flag-icon-fr"></i> France
+                    <i class="fas fa-leaf"></i> Jumps
+                </button>
+                <button class="filter-button">
+                    <i class="fas fa-star"></i> Featured
                 </button>
             </div>
         </div>
@@ -81,11 +94,11 @@ requireLogin();
             foreach ($allCourses as $courseName => $courseData): ?>
                 <!-- Course Container -->
                 <div class="course-container">
-                    <div class="course-header turf expanded">
-                        <h2><img class="course-logo"> <?php echo htmlspecialchars($courseName); ?></h2>
-                        <div class="toggle-icon">▼</div>
-                    </div>
-                    <div class="races-container">
+    <div class="course-header turf collapsed"> <!-- Changed from 'expanded' to 'collapsed' -->
+        <h2><img class="course-logo"> <?php echo htmlspecialchars($courseName); ?></h2>
+        <div class="toggle-icon">▶</div> <!-- Changed from ▼ to ▶ to indicate collapsed state -->
+    </div>
+    <div class="races-container" style="display: none;"> <!-- Add style="display: none;" to hide by default -->
                         <?php 
                         // Sort race times chronologically
                         $races = $courseData['races'];

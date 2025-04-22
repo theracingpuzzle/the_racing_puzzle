@@ -1,4 +1,11 @@
 <?php
+
+// dashboard/index.php
+require_once '../user-management/auth.php'; // Adjust path as needed
+requireLogin();
+
+// Continue with the rest of your dashboard code
+
 // For proof of concept - simulate logged-in user
 $user_id = 1; // Hardcoded user ID for demonstration
 $username = "DemoUser";
@@ -179,12 +186,15 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
     <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0-alpha1/dist/css/bootstrap.min.css" rel="stylesheet">
     <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0-beta3/css/all.min.css" rel="stylesheet">
     
-    <link rel="stylesheet" href="assets/css/leagues.css">
+     <!-- Main CSS -->
+     <link rel="stylesheet" href="../assets/css/main.css">  
 
-    <link rel="stylesheet" href="../assets/css/sidebar.css">
+    <!-- <link rel="stylesheet" href="assets/css/leagues.css"> -->
     
 </head>
 <body>
+
+<?php include '../test/app-header.php'; ?>
     
     <main class="container">
         <h1 class="my-4">Horse Racing Leagues</h1>
@@ -417,13 +427,11 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
         </div>
     </div>
 
-    <?php include_once "../includes/sidebar.php"; ?>
+    <?php include_once "../test/bottom-nav.php"; ?>
     
     <!-- Bootstrap JS Bundle with Popper -->
     <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0-alpha1/dist/js/bootstrap.bundle.min.js"></script>
 
-        <!-- Link to sidebar JavaScript -->
-<script src="../assets/js/sidebar.js"></script>
     
     <script src="assets/js/leagues.js"></script>
 </body>

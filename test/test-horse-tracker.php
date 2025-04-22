@@ -1,11 +1,3 @@
-<?php
-// dashboard/index.php
-require_once '../user-management/auth.php'; // Adjust path as needed
-requireLogin();
-
-// Continue with the rest of your dashboard code
-?>
-
 <!DOCTYPE html>
 <html lang="en">
 <head>
@@ -16,12 +8,26 @@ requireLogin();
     <link href="https://fonts.googleapis.com/css2?family=Montserrat:wght@400;600;700&family=Playfair+Display:wght@700&family=Source+Sans+Pro:wght@400;600&family=Roboto:wght@400;500&display=swap" rel="stylesheet">
     <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0-beta3/css/all.min.css" rel="stylesheet">
     <!-- Link to main.css instead of horse_tracker.css -->
-    <link rel="stylesheet" href="../assets/css/main.css">
+    <link rel="stylesheet" href="main.css">
 </head>
 
 <body>
-
-<?php include '../test/app-header.php'; ?>
+    <!-- App Header -->
+    <header class="app-header">
+        <div class="container">
+            <div class="header-content">
+                <div class="logo-container">
+                    <img src="path-to-your-logo.png" alt="Racing Logo">
+                    <h1>Horse Tracker</h1>
+                </div>
+                <div class="header-actions">
+                    <button class="action-button"><i class="fas fa-search"></i></button>
+                    <button class="action-button"><i class="fas fa-bell"></i></button>
+                    <button class="action-button primary"><i class="fas fa-user"></i></button>
+                </div>
+            </div>
+        </div>
+    </header>
 
     <div class="container mt-20">
         <div class="d-flex justify-between align-center mb-10">
@@ -119,7 +125,29 @@ requireLogin();
         </div>
     </div>
 
-    <?php include '../test/bottom-nav.php'; ?>
+    <!-- Bottom Navigation -->
+    <nav class="bottom-nav">
+        <a href="#" class="nav-item">
+            <i class="fas fa-home nav-icon"></i>
+            <span>Home</span>
+        </a>
+        <a href="#" class="nav-item">
+            <i class="fas fa-calendar nav-icon"></i>
+            <span>Races</span>
+        </a>
+        <a href="#" class="nav-item active">
+            <i class="fas fa-horse nav-icon"></i>
+            <span>My Horses</span>
+        </a>
+        <a href="#" class="nav-item">
+            <i class="fas fa-ticket-alt nav-icon"></i>
+            <span>Betting</span>
+        </a>
+        <a href="#" class="nav-item">
+            <i class="fas fa-cog nav-icon"></i>
+            <span>Settings</span>
+        </a>
+    </nav>
 
     <script>
         document.addEventListener('DOMContentLoaded', function() {
@@ -371,7 +399,7 @@ requireLogin();
                     formData.append('notify', '1');
                 }
                 
-                fetch('horse-action.php', {
+                fetch('horse-actions.php', {
                     method: 'POST',
                     body: formData
                 })

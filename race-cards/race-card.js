@@ -112,4 +112,27 @@ function initViewToggleButtons() {
     });
 }
 
+document.addEventListener('DOMContentLoaded', function() {
+    // Course header click handlers
+    document.querySelectorAll('.course-header').forEach(header => {
+        header.addEventListener('click', function() {
+            const courseContainer = this.closest('.course-container');
+            const racesContainer = courseContainer.querySelector('.races-container');
+            const toggleIcon = this.querySelector('.toggle-icon');
+            
+            // Toggle expanded/collapsed class
+            this.classList.toggle('collapsed');
+            this.classList.toggle('expanded');
+            
+            // Toggle races container visibility
+            if (racesContainer.style.display === 'none') {
+                racesContainer.style.display = 'block';
+                toggleIcon.textContent = '▼'; // Change icon to indicate expanded
+            } else {
+                racesContainer.style.display = 'none';
+                toggleIcon.textContent = '▶'; // Change icon to indicate collapsed
+            }
+        });
+    });
+});
 

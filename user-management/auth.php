@@ -2,7 +2,7 @@
 // auth.php - Authentication system for racing website
 
 // Include your existing database connection
-require_once 'db-connection.php';
+require_once '../includes/db-connection.php';
 
 // Setup the users tables if they don't exist
 function setupUserTables() {
@@ -158,6 +158,18 @@ function isLoggedIn() {
     }
     
     return false;
+}
+
+// Check if user is logged in and redirect to login if not
+function requireLogin() {
+    if (!isLoggedIn()) {
+        // Store the requested URL to redirect back after login
+        $_SESSION['redirect_after_login'] = $_SERVER['REQUEST_URI'];
+        
+        // Redirect to login page
+        header('Location: ../user-management/login.php');
+        exit;
+    }
 }
 
 // User logout

@@ -22,8 +22,11 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
     $result = loginUser($username, $password);
     
     if ($result['success']) {
+        // Store the username in the session
+        $_SESSION['username'] = $username;
+    
         // Redirect to dashboard or home page
-        header('Location: dashboard2.php');
+        header('Location: ../dashboard');
         exit;
     } else {
         // Store error message in session and redirect back to the form
