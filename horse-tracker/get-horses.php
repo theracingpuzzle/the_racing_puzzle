@@ -5,6 +5,19 @@ header('Content-Type: application/json');
 // Include database functions
 require_once 'horse-tracker-functions.php';
 
+// Start session if not already started
+if (session_status() === PHP_SESSION_NONE) {
+    session_start();
+}
+
+// Check if user is logged in
+if (!isset($_SESSION['user_id'])) {
+    echo json_encode(['success' => false, 'message' => 'User not authenticated']);
+    exit;
+}
+
+$user_id = $_SESSION['user_id'];
+
 // Get parameters
 $sort = isset($_GET['sort']) ? $_GET['sort'] : 'name';
 $search = isset($_GET['search']) ? $_GET['search'] : '';
@@ -14,8 +27,12 @@ $id = isset($_GET['id']) ? $_GET['id'] : null;
 if ($id) {
     try {
         $db = getDbConnection();
-        $stmt = $db->prepare("SELECT * FROM horse_tracker WHERE id = :id");
-        $stmt->execute([':id' => $id]);
+        // Add user_id to the query to ensure the user only accesses their own horses
+        $stmt = $db->prepare("SELECT * FROM horse_tracker WHERE id = :id AND user_id = :user_id");
+        $stmt->bindParam(':id', $id, PDO::PARAM_INT);
+        $stmt->bindParam(':user_id', $user_id, PDO::PARAM_INT);
+        $stmt->execute();
+        
         $horse = $stmt->fetch(PDO::FETCH_ASSOC);
         
         if ($horse) {
@@ -28,7 +45,8 @@ if ($id) {
                 'next_race_date' => $horse['next_race_date'] ?? '',
                 'last_run_notes' => $horse['notes'] ?? '',
                 'notify' => $horse['notify'] ?? '1',
-                'date_added' => $horse['date_added'] ?? ''
+                'date_added' => $horse['date_added'] ?? '',
+                'user_id' => $horse['user_id']
             ];
             
             echo json_encode(['success' => true, 'horse' => $horse]);
@@ -42,11 +60,11 @@ if ($id) {
     }
 }
 
-// Get horses
+// Get horses - use the updated functions with user_id parameter
 if (!empty($search)) {
-    $horses = searchHorses($search);
+    $horses = searchHorses($user_id, $search);
 } else {
-    $horses = getAllHorses($sort);
+    $horses = getAllHorses($user_id, $sort);
 }
 
 // Format dates for display

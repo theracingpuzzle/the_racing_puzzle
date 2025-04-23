@@ -12,8 +12,10 @@ requireLogin();
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Support The Racing Puzzle - Donate Today</title>
+    <link href="https://fonts.googleapis.com/css2?family=Montserrat:wght@400;500;600;700&family=Playfair+Display:wght@700&family=Roboto+Mono&family=Source+Sans+Pro:wght@400;600&display=swap" rel="stylesheet">
     <link rel="stylesheet" href="../assets/css/main.css">
-    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/5.15.4/css/all.min.css">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+
     <!-- <link rel="stylesheet" href="../assets/css/sidebar.css"> -->
     <script src="assets/js/paypal.js" defer></script>
     <style>
@@ -246,26 +248,8 @@ requireLogin();
     </style>
 </head>
 <body>
-    <div class="container">
-        <header class="app-header">
-            <div class="header-content">
-                <div class="logo-container">
-                    <img src="../assets/images/racing-logo.png" alt="The Racing Puzzle Logo">
-                    <h1>The Racing Puzzle</h1>
-                </div>
-                <div class="header-actions">
-                    <button class="action-button">
-                        <i class="fas fa-search"></i>
-                    </button>
-                    <button class="action-button">
-                        <i class="fas fa-user"></i>
-                    </button>
-                    <button class="action-button primary">
-                        <i class="fas fa-heart"></i>
-                    </button>
-                </div>
-            </div>
-        </header>
+
+<?php include '../test/app-header.php'; ?>
 
         <div class="card mt-20">
             <div class="card-header">

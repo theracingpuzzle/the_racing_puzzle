@@ -151,6 +151,8 @@ requireLogin();
 
                                 <!-- Runner Cards -->
                                 <div class="runners-grid">
+                                <!-- <pre><?php print_r($race['runners'][0]); ?></pre> -->
+
                                     <?php foreach ($race['runners'] as $runner): ?>
                                         <div class="runner-card">
                                             <div class="runner-header">
@@ -180,11 +182,14 @@ requireLogin();
                                                     <div class="data-label">Draw:</div>
                                                     <div class="data-value"><?php echo htmlspecialchars($runner['draw']); ?> of <?php echo $race['field_size']; ?></div>
                                                 </div>
+                                                <div class="data-row">
+                                                    <div class="data-label">Horse ID:</div>
+                                                    <div class="data-value"><?php echo htmlspecialchars($runner['horse_id']); ?></div>
+                                                </div>
                                             </div>
                                             <div class="runner-footer">
                                                 <div class="odds-display">
-                                                    <!-- Placeholder for odds - not in JSON -->
-                                                    5/1
+                                                <div class="data-value"><?php echo htmlspecialchars($runner['comment']); ?></div>
                                                 </div>
                                                 <div class="action-buttons">
     <button class="runner-action" 
@@ -288,29 +293,7 @@ requireLogin();
         </div>
     </div>
 
-    <!-- Bottom Navigation -->
-    <nav class="bottom-nav">
-        <a href="../dashboard" class="nav-item active">
-            <i class="fas fa-calendar-day nav-icon"></i>
-            <span>Dashboard</span>
-        </a>
-        <a href="../horse-tracker" class="nav-item">
-            <i class="fas fa-star nav-icon"></i>
-            <span>My Tracker</span>
-        </a>
-        <a href="../bet-record" class="nav-item">
-            <i class="fas fa-chart-line nav-icon"></i>
-            <span>My Results</span>
-        </a>
-        <a href="../race-cards" class="nav-item">
-            <i class="fas fa-list-ul nav-icon"></i>
-            <span>Racecards</span>
-        </a>
-        <a href="../leagues" class="nav-item">
-            <i class="fas fa-user nav-icon"></i>
-            <span>My Leagues</span>
-        </a>
-    </nav>
+    <?php include '../test/bottom-nav.php'; ?>
 
     <!-- Quick Tracker Modal -->
 <div id="quick-tracker-modal" class="modal">

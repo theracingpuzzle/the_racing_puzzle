@@ -47,7 +47,7 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
     }
     
     // Redirect back to dashboard
-    header('Location: dashboard2.php#profile');
+    header('Location: ../dashboard#profile');
     exit;
 }
 ?>

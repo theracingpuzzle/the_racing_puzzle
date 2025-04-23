@@ -23,9 +23,10 @@ $username = $_SESSION['username'] ?? null;
         <button class="action-button" title="Notifications" aria-label="Notifications">
           <i class="fas fa-bell"></i>
         </button>
-        <button class="action-button" title="My Tracker" aria-label="My Tracker">
-          <i class="fas fa-star"></i>
-        </button>
+        <a href="../donate" class="action-button" title="PayPal" aria-label="PayPal">
+  <i class="fab fa-paypal"></i>
+</a>
+
 
         <!-- Profile Button -->
 <a href="../user-management/profile.php" class="action-button user-action" aria-label="Profile">

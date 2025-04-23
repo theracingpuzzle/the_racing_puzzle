@@ -20,9 +20,9 @@ function getDbConnection() {
 }
 
 /**
- * Get all horses from the database, sorted as specified
+ * Get all horses from the database for a specific user, sorted as specified
  */
-function getAllHorses($sort = 'name') {
+function getAllHorses($user_id, $sort = 'name') {
     try {
         $db = getDbConnection();
         if (!$db) return [];
@@ -37,9 +37,10 @@ function getAllHorses($sort = 'name') {
         // Use the mapped column name if available, otherwise use horse_name
         $sortColumn = isset($sortMap[$sort]) ? $sortMap[$sort] : 'horse_name';
         
-        // Use the correct table name: horse_tracker
-        $query = "SELECT * FROM horse_tracker ORDER BY $sortColumn";
+        // Add user_id filter to the query
+        $query = "SELECT * FROM horse_tracker WHERE user_id = :user_id ORDER BY $sortColumn";
         $stmt = $db->prepare($query);
+        $stmt->bindParam(':user_id', $user_id, PDO::PARAM_INT);
         $stmt->execute();
         
         $horses = $stmt->fetchAll(PDO::FETCH_ASSOC);
@@ -54,7 +55,8 @@ function getAllHorses($sort = 'name') {
                 'next_race_date' => $horse['next_race_date'] ?? '',
                 'last_run_notes' => $horse['notes'] ?? '', // Assuming notes maps to last_run_notes
                 'notify' => $horse['notify'] ?? '1',
-                'date_added' => $horse['date_added'] ?? ''
+                'date_added' => $horse['date_added'] ?? '',
+                'user_id' => $horse['user_id']
             ];
         }, $horses);
     } catch (PDOException $e) {
@@ -64,17 +66,19 @@ function getAllHorses($sort = 'name') {
 }
 
 /**
- * Search for horses by name or trainer
+ * Search for horses by name or trainer for a specific user
  */
-function searchHorses($search) {
+function searchHorses($user_id, $search) {
     try {
         $db = getDbConnection();
         if (!$db) return [];
         
-        // Use the correct table name
-        $query = "SELECT * FROM horse_tracker WHERE horse_name LIKE :search OR trainer LIKE :search";
+        // Add user_id filter to the query
+        $query = "SELECT * FROM horse_tracker WHERE user_id = :user_id AND (horse_name LIKE :search OR trainer LIKE :search)";
         $stmt = $db->prepare($query);
-        $stmt->execute([':search' => "%$search%"]);
+        $stmt->bindParam(':user_id', $user_id, PDO::PARAM_INT);
+        $stmt->bindParam(':search', "%$search%");
+        $stmt->execute();
         
         $horses = $stmt->fetchAll(PDO::FETCH_ASSOC);
         
@@ -88,12 +92,51 @@ function searchHorses($search) {
                 'next_race_date' => $horse['next_race_date'] ?? '',
                 'last_run_notes' => $horse['notes'] ?? '', // Assuming notes maps to last_run_notes
                 'notify' => $horse['notify'] ?? '1',
-                'date_added' => $horse['date_added'] ?? ''
+                'date_added' => $horse['date_added'] ?? '',
+                'user_id' => $horse['user_id']
             ];
         }, $horses);
     } catch (PDOException $e) {
         error_log("Error searching horses: " . $e->getMessage());
         return [];
+    }
+}
+
+/**
+ * Get a single horse by ID, ensuring it belongs to the specified user
+ */
+function getHorseById($user_id, $horse_id) {
+    try {
+        $db = getDbConnection();
+        if (!$db) return null;
+        
+        $query = "SELECT * FROM horse_tracker WHERE id = :id AND user_id = :user_id";
+        $stmt = $db->prepare($query);
+        $stmt->bindParam(':id', $horse_id, PDO::PARAM_INT);
+        $stmt->bindParam(':user_id', $user_id, PDO::PARAM_INT);
+        $stmt->execute();
+        
+        $horse = $stmt->fetch(PDO::FETCH_ASSOC);
+        
+        if (!$horse) {
+            return null;
+        }
+        
+        // Transform column names to match JavaScript expectations
+        return [
+            'id' => $horse['id'],
+            'name' => $horse['horse_name'],
+            'trainer' => $horse['trainer'],
+            'jockey' => $horse['jockey'] ?? '',
+            'next_race_date' => $horse['next_race_date'] ?? '',
+            'last_run_notes' => $horse['notes'] ?? '',
+            'notify' => $horse['notify'] ?? '1',
+            'date_added' => $horse['date_added'] ?? '',
+            'user_id' => $horse['user_id']
+        ];
+    } catch (PDOException $e) {
+        error_log("Error getting horse by ID: " . $e->getMessage());
+        return null;
     }
 }
 ?>

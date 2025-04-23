@@ -23,122 +23,52 @@ if (isset($_SESSION['login_error'])) {
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Login - Racing Puzzle</title>
-    <link rel="stylesheet" href="css/style.css">
-    <style>
-        body {
-            font-family: Arial, sans-serif;
-            background-color: #f4f4f4;
-            margin: 0;
-            padding: 0;
-        }
-        .container {
-            max-width: 500px;
-            margin: 50px auto;
-            background: white;
-            padding: 20px;
-            border-radius: 8px;
-            box-shadow: 0 2px 10px rgba(0,0,0,0.1);
-        }
-        h1 {
-            text-align: center;
-            color: #333;
-        }
-        .form-group {
-            margin-bottom: 15px;
-        }
-        label {
-            display: block;
-            margin-bottom: 5px;
-            font-weight: bold;
-        }
-        input[type="text"],
-        input[type="email"],
-        input[type="password"] {
-            width: 100%;
-            padding: 10px;
-            border: 1px solid #ddd;
-            border-radius: 4px;
-            font-size: 16px;
-            box-sizing: border-box;
-        }
-        button {
-            background-color: #4CAF50;
-            color: white;
-            border: none;
-            padding: 12px 20px;
-            margin-top: 10px;
-            border-radius: 4px;
-            cursor: pointer;
-            font-size: 16px;
-            width: 100%;
-        }
-        button:hover {
-            background-color: #45a049;
-        }
-        .alert {
-            padding: 10px;
-            margin: 15px 0;
-            border-radius: 4px;
-        }
-        .alert-success {
-            background-color: #d4edda;
-            color: #155724;
-            border: 1px solid #c3e6cb;
-        }
-        .alert-danger {
-            background-color: #f8d7da;
-            color: #721c24;
-            border: 1px solid #f5c6cb;
-        }
-        .links {
-            text-align: center;
-            margin-top: 20px;
-        }
-        .links a {
-            margin: 0 10px;
-            color: #4CAF50;
-            text-decoration: none;
-        }
-        .links a:hover {
-            text-decoration: underline;
-        }
-    </style>
+    <link rel="stylesheet" href="../assets/css/main.css">
+    <link href="https://fonts.googleapis.com/css2?family=Montserrat:wght@400;600;700&family=Playfair+Display:wght@700&family=Source+Sans+Pro:wght@400;600&family=Roboto:wght@400;500&display=swap" rel="stylesheet">
 </head>
 <body>
-    <div class="container">
-        <h1>Login to Racing Puzzle</h1>
-        
-        <?php if ($registered): ?>
-            <div class="alert alert-success">
-                Registration successful! You can now login with your credentials.
-            </div>
-        <?php endif; ?>
-        
-        <?php if ($login_error): ?>
-            <div class="alert alert-danger">
-                <?php echo htmlspecialchars($login_error); ?>
-            </div>
-        <?php endif; ?>
-        
-        <form action="process_login.php" method="post">
-            <input type="hidden" name="csrf_token" value="<?php echo generateCSRFToken(); ?>">
-            
-            <div class="form-group">
-                <label for="username">Username or Email:</label>
-                <input type="text" id="username" name="username" required>
+    <div class="container mt-20">
+        <div class="card" style="max-width: 500px; margin: 50px auto;">
+            <div class="card-header">
+                <h3 class="text-center" style="margin-bottom: 0;">Login to Racing Puzzle</h3>
             </div>
             
-            <div class="form-group">
-                <label for="password">Password:</label>
-                <input type="password" id="password" name="password" required>
+            <div class="card-body">
+                <?php if ($registered): ?>
+                    <div class="mb-20" style="background-color: rgba(30, 86, 49, 0.1); color: var(--primary-color); padding: 12px; border-radius: var(--radius-sm); border-left: 4px solid var(--primary-color);">
+                        Registration successful! You can now login with your credentials.
+                    </div>
+                <?php endif; ?>
+                
+                <?php if ($login_error): ?>
+                    <div class="mb-20" style="background-color: rgba(158, 42, 43, 0.1); color: var(--feature-race-color); padding: 12px; border-radius: var(--radius-sm); border-left: 4px solid var(--feature-race-color);">
+                        <?php echo htmlspecialchars($login_error); ?>
+                    </div>
+                <?php endif; ?>
+                
+                <form action="process_login.php" method="post">
+                    <input type="hidden" name="csrf_token" value="<?php echo generateCSRFToken(); ?>">
+                    
+                    <div class="form-group mb-20">
+                        <label for="username" style="font-weight: 600; display: block; margin-bottom: 5px;">Username or Email:</label>
+                        <input type="text" id="username" name="username" required>
+                    </div>
+                    
+                    <div class="form-group mb-20">
+                        <label for="password" style="font-weight: 600; display: block; margin-bottom: 5px;">Password:</label>
+                        <input type="password" id="password" name="password" required>
+                    </div>
+                    
+                    <button type="submit" class="btn btn-primary" style="width: 100%;">Login</button>
+                </form>
             </div>
             
-            <button type="submit">Login</button>
-        </form>
-        
-        <div class="links">
-            <a href="forgot_password.php">Forgot Password?</a>
-            <a href="register.php">Create an Account</a>
+            <div class="card-footer text-center">
+                <div class="d-flex justify-between">
+                    <a href="forgot_password.php">Forgot Password?</a>
+                    <a href="register.php">Create an Account</a>
+                </div>
+            </div>
         </div>
     </div>
 </body>

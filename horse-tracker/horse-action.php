@@ -5,6 +5,19 @@ header('Content-Type: application/json');
 // Include database functions
 require_once 'horse-tracker-functions.php';
 
+// Start session if not already started
+if (session_status() === PHP_SESSION_NONE) {
+    session_start();
+}
+
+// Check if user is logged in
+if (!isset($_SESSION['user_id'])) {
+    echo json_encode(['success' => false, 'message' => 'User not authenticated']);
+    exit;
+}
+
+$user_id = $_SESSION['user_id'];
+
 // Check if action is set
 if (!isset($_POST['action'])) {
     echo json_encode(['success' => false, 'message' => 'No action specified']);
@@ -24,19 +37,19 @@ if ($action === 'add') {
     try {
         $db = getDbConnection();
         
-        // Prepare SQL statement
+        // Prepare SQL statement with user_id
         $stmt = $db->prepare("
             INSERT INTO horse_tracker 
-            (horse_name, trainer, notes, date_added) 
+            (horse_name, trainer, notes, date_added, user_id) 
             VALUES 
-            (:name, :trainer, :notes, datetime('now'))
+            (:name, :trainer, :notes, datetime('now'), :user_id)
         ");
         
         // Bind parameters
         $stmt->bindParam(':name', $_POST['name']);
-        
         $stmt->bindParam(':trainer', $_POST['trainer']);
         $stmt->bindParam(':notes', $_POST['last_run_notes']);
+        $stmt->bindParam(':user_id', $user_id, PDO::PARAM_INT);
         
         // Execute the statement
         $stmt->execute();
@@ -57,22 +70,32 @@ else if ($action === 'update') {
     try {
         $db = getDbConnection();
         
-        // Prepare SQL statement
+        // First check if the horse belongs to the user
+        $checkStmt = $db->prepare("SELECT id FROM horse_tracker WHERE id = :id AND user_id = :user_id");
+        $checkStmt->bindParam(':id', $_POST['id'], PDO::PARAM_INT);
+        $checkStmt->bindParam(':user_id', $user_id, PDO::PARAM_INT);
+        $checkStmt->execute();
+        
+        if ($checkStmt->rowCount() === 0) {
+            echo json_encode(['success' => false, 'message' => 'Horse not found or access denied']);
+            exit;
+        }
+        
+        // Prepare SQL statement (fix the SQL syntax by removing the trailing comma)
         $stmt = $db->prepare("
             UPDATE horse_tracker SET
             horse_name = :name,
             trainer = :trainer,
-            notes = :notes,
-            WHERE id = :id
+            notes = :notes
+            WHERE id = :id AND user_id = :user_id
         ");
         
         // Bind parameters
         $stmt->bindParam(':id', $_POST['id']);
         $stmt->bindParam(':name', $_POST['name']);
-        
         $stmt->bindParam(':trainer', $_POST['trainer']);
         $stmt->bindParam(':notes', $_POST['last_run_notes']);
-        
+        $stmt->bindParam(':user_id', $user_id, PDO::PARAM_INT);
         
         // Execute the statement
         $stmt->execute();
@@ -93,11 +116,23 @@ else if ($action === 'delete') {
     try {
         $db = getDbConnection();
         
-        // Prepare SQL statement
-        $stmt = $db->prepare("DELETE FROM horse_tracker WHERE id = :id");
+        // First check if the horse belongs to the user
+        $checkStmt = $db->prepare("SELECT id FROM horse_tracker WHERE id = :id AND user_id = :user_id");
+        $checkStmt->bindParam(':id', $_POST['id'], PDO::PARAM_INT);
+        $checkStmt->bindParam(':user_id', $user_id, PDO::PARAM_INT);
+        $checkStmt->execute();
         
-        // Bind parameter
+        if ($checkStmt->rowCount() === 0) {
+            echo json_encode(['success' => false, 'message' => 'Horse not found or access denied']);
+            exit;
+        }
+        
+        // Prepare SQL statement
+        $stmt = $db->prepare("DELETE FROM horse_tracker WHERE id = :id AND user_id = :user_id");
+        
+        // Bind parameters
         $stmt->bindParam(':id', $_POST['id']);
+        $stmt->bindParam(':user_id', $user_id, PDO::PARAM_INT);
         
         // Execute the statement
         $stmt->execute();
@@ -106,6 +141,22 @@ else if ($action === 'delete') {
     } catch (PDOException $e) {
         echo json_encode(['success' => false, 'message' => 'Database error: ' . $e->getMessage()]);
     }
+}
+// Get horses
+else if ($action === 'get') {
+    $sort = isset($_POST['sort']) ? $_POST['sort'] : 'name';
+    $horses = getAllHorses($user_id, $sort);
+    echo json_encode(['success' => true, 'horses' => $horses]);
+}
+// Search horses
+else if ($action === 'search') {
+    if (!isset($_POST['search']) || empty($_POST['search'])) {
+        echo json_encode(['success' => false, 'message' => 'Search term is required']);
+        exit;
+    }
+    
+    $horses = searchHorses($user_id, $_POST['search']);
+    echo json_encode(['success' => true, 'horses' => $horses]);
 }
 // Unknown action
 else {

@@ -33,20 +33,13 @@ def scrape_racing_calendar():
             
         date_str = date_header.text.strip()
         try:
-            # Convert date string to datetime object
-            date_obj = datetime.strptime(date_str, "%dst %B %Y")
-        except ValueError:
-            try:
-                date_obj = datetime.strptime(date_str, "%dnd %B %Y")
-            except ValueError:
-                try:
-                    date_obj = datetime.strptime(date_str, "%drd %B %Y")
-                except ValueError:
-                    try:
-                        date_obj = datetime.strptime(date_str, "%dth %B %Y")
-                    except ValueError:
-                        # If all formats fail, just use the string
-                        date_obj = date_str
+            # Parse date string with various ordinal suffixes
+            date_str_clean = re.sub(r'(\d+)(st|nd|rd|th)', r'\1', date_str)
+            date_obj = datetime.strptime(date_str_clean, "%d %B %Y")
+        except ValueError as e:
+            print(f"Date parsing error: {e} for '{date_str}'")
+            # If format fails, just use the string
+            date_obj = date_str
         
         # Format date as yyyy-mm-dd if it's a datetime object
         if isinstance(date_obj, datetime):
@@ -58,40 +51,57 @@ def scrape_racing_calendar():
         race_items = panel.find_all('li', class_='calendar-filter-item')
         
         for item in race_items:
-            # Extract racecourse name
-            racecourse = item.get_text().split('<small>')[0].strip()
+            # Extract full text content
+            full_text = item.get_text(strip=True)
             
-            # Extract details from small tag
+            # Extract racecourse name and details
             small_tag = item.find('small')
+            
+            # Initialize variables
+            racecourse_name = ""
+            time_of_day = ""
+            surface = ""
+            race_type = ""
+            
             if small_tag:
                 details = small_tag.text.strip()
+                racecourse_name = full_text.replace(details, '').strip()
                 
-                # Parse details inside parentheses
-                time_of_day = re.search(r'\(([^)]*)\)', details)
-                time_of_day = time_of_day.group(1) if time_of_day else ""
+                # Process the details to extract the information
+                # Pattern for details like: (Afternoon) (Turf) (Jumps)
+                pattern = r'\(([^)]+)\)'
+                matches = re.findall(pattern, details)
                 
-                surface = re.search(r'\([^)]*\) \(([^)]*)\)', details)
-                surface = surface.group(1) if surface else ""
-                
-                race_type = re.search(r'\([^)]*\) \([^)]*\) \(([^)]*)\)', details)
-                race_type = race_type.group(1) if race_type else ""
+                # Assign matches to appropriate categories based on position and expected values
+                for i, match in enumerate(matches):
+                    match = match.strip()
+                    if i == 0 and match in ["Afternoon", "Evening"]:
+                        time_of_day = match
+                    elif i == 1 and match in ["Turf", "AW"]:
+                        surface = match
+                    elif i == 2 and match in ["Flat", "Jumps"]:
+                        race_type = match
             else:
-                time_of_day = ""
-                surface = ""
-                race_type = ""
+                racecourse_name = full_text
                 
-            # Extract classes for additional information
+            # Extract country from classes
             classes = item.get('class', [])
             country = "UK" if "uk" in classes else "Ireland" if "ire" in classes else "Unknown"
                 
-            all_races.append({
+            # Format the racecourse string with the details
+            racecourse_with_details = f"{racecourse_name} ({time_of_day}) ({surface}) ({race_type})"
+            
+            # Create race data dictionary
+            race_data = {
                 'Date': formatted_date,
-                'Racecourse': racecourse,
+                'Racecourse': racecourse_with_details,
                 'Time of Day': time_of_day,
                 'Surface': surface,
                 'Race Type': race_type,
                 'Country': country
-            })
+            }
+            
+            all_races.append(race_data)
     
     return pd.DataFrame(all_races)
 

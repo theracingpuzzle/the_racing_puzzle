@@ -1,5 +1,16 @@
- <!-- Link to main.css instead of horse_tracker.css -->
- <link rel="stylesheet" href="../assets/css/main.css">
+<?php
+// dashboard/index.php
+require_once 'auth.php'; // Adjust path as needed
+requireLogin();
+
+// Continue with the rest of your dashboard code
+?>
+ 
+ <link href="https://fonts.googleapis.com/css2?family=Montserrat:wght@400;500;600;700&family=Playfair+Display:wght@700&family=Roboto+Mono&family=Source+Sans+Pro:wght@400;600&display=swap" rel="stylesheet">
+    <link rel="stylesheet" href="../assets/css/main.css">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+
+ <?php include '../test/app-header.php'; ?>
  
  <!-- User Profile/Settings Section (Tabbed) -->
  <div class="row">
