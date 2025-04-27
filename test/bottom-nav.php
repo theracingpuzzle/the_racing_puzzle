@@ -18,7 +18,7 @@ $currentDirectory = basename(dirname($_SERVER['PHP_SELF']));
     </a>
     <a href="../bet-record" class="nav-item <?= ($currentDirectory == 'bet-record') ? 'active' : '' ?>">
       <i class="fas fa-chart-line nav-icon"></i>
-      <span>My Results</span>
+      <span>My Records</span>
     </a>
     <a href="../race-cards" class="nav-item <?= ($currentDirectory == 'race-cards') ? 'active' : '' ?>">
       <i class="fas fa-list-ul nav-icon"></i>

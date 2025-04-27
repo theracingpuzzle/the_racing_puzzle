@@ -1,0 +1,152 @@
+/* Bet Slip Modal Styles */
+.bet-slip-modal {
+    display: none;
+    position: fixed;
+    z-index: 1000;
+    left: 0;
+    top: 0;
+    width: 100%;
+    height: 100%;
+    overflow: auto;
+    background-color: rgba(0,0,0,0.4);
+}
+
+.bet-slip-modal.top-right .bet-slip-content {
+    position: absolute;
+    top: 20px;
+    right: 20px;
+    margin: 0;
+    width: 320px;
+    max-width: 90%;
+}
+
+.bet-slip-content {
+    background-color: #ffffff;
+    margin: 10% auto;
+    padding: 0;
+    border-radius: 8px;
+    box-shadow: 0 5px 15px rgba(0,0,0,0.2);
+    width: 350px;
+    max-width: 90%;
+    animation: slideIn 0.3s ease;
+}
+
+@keyframes slideIn {
+    from {transform: translateY(-20px); opacity: 0;}
+    to {transform: translateY(0); opacity: 1;}
+}
+
+.bet-slip-content .modal-header {
+    background-color: #212a3e;
+    color: white;
+    padding: 12px 16px;
+    border-radius: 8px 8px 0 0;
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+}
+
+.bet-slip-content .modal-header h2 {
+    margin: 0;
+    font-size: 18px;
+    color: white;
+}
+
+.close-bet-slip {
+    color: white;
+    font-size: 24px;
+    font-weight: bold;
+    cursor: pointer;
+}
+
+.bet-slip-details {
+    padding: 16px;
+}
+
+.bet-slip-race, 
+.bet-slip-selection,
+.bet-slip-horse-container,
+.bet-slip-jockey-container,
+.bet-slip-trainer-container,
+.bet-slip-odds,
+.bet-slip-stake,
+.bet-slip-returns {
+    margin-bottom: 12px;
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+}
+
+.bet-slip-selection {
+    flex-direction: column;
+    align-items: flex-start;
+    padding: 10px;
+    background-color: #f7f7f7;
+    border-radius: 6px;
+    margin: 10px 0;
+}
+
+.bet-slip-horse-container,
+.bet-slip-jockey-container,
+.bet-slip-trainer-container {
+    width: 100%;
+    margin-bottom: 8px;
+}
+
+.bet-slip-label {
+    font-weight: 600;
+    color: #555;
+    font-size: 14px;
+    width: 80px;
+}
+
+.bet-slip-value {
+    font-size: 14px;
+    flex: 1;
+    text-align: right;
+}
+
+.bet-slip-value.horse-name {
+    font-weight: 700;
+    color: #212a3e;
+}
+
+.bet-slip-stake-input {
+    width: 80px;
+    padding: 6px;
+    border: 1px solid #ddd;
+    border-radius: 4px;
+    text-align: right;
+}
+
+.bet-slip-actions {
+    display: flex;
+    justify-content: space-between;
+    padding: 12px 16px;
+    border-top: 1px solid #eee;
+}
+
+.bet-slip-actions button {
+    padding: 8px 16px;
+    border-radius: 4px;
+    font-weight: 600;
+    cursor: pointer;
+}
+
+.btn-secondary {
+    background-color: #f1f1f1;
+    color: #333;
+    border: 1px solid #ddd;
+}
+
+.btn-primary {
+    background-color: #212a3e;
+    color: white;
+    border: none;
+}
+
+.btn-primary:hover {
+    background-color: #3a4a6d;
+}
+
+

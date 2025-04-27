@@ -20,6 +20,7 @@ requireLogin();
     <link rel="stylesheet" href="racecard2.css">
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/flag-icon-css/3.5.0/css/flag-icon.min.css" />
 
+    <link rel="stylesheet" href="bet-slip.css">
 
        
 </head>
@@ -35,7 +36,7 @@ requireLogin();
             <div class="date-slider">
                 <?php
                 // Create date slider
-                $today = strtotime('2025-04-20'); // Using the date from your content
+                $today = strtotime('2025-04-23'); // Using the date from your content
                 for ($i = -3; $i <= 3; $i++) {
                     $date = strtotime("$i days", $today);
                     $isActive = $i === 0 ? 'active' : '';
@@ -202,7 +203,7 @@ requireLogin();
         <i class="far fa-star"></i>
     </button>
     <button class="runner-action">
-        <i class="fas fa-info-circle"></i>
+        <i class="fas fa-circle-plus"></i>
     </button>
 </div>
 
@@ -255,11 +256,17 @@ requireLogin();
                                                     </td>
                                                     <td class="actions-col">
                                                         <div class="table-actions">
-                                                            <button class="table-action-btn" title="Add to Tracker">
-                                                                <i class="far fa-star"></i>
+                                                            <button class="table-action-btn"
+                                                            onclick="openQuickTracker(
+                                                        '<?php echo addslashes($runner['name']); ?>', 
+                                                        '<?php echo addslashes($runner['jockey']); ?>', 
+                                                         '<?php echo addslashes($runner['trainer']); ?>'
+                                                          )"
+                                                           >   
+                                                            <i class="far fa-star"></i>
                                                             </button>
                                                             <button class="table-action-btn" title="Runner Details">
-                                                                <i class="fas fa-info-circle"></i>
+                                                                <i class="fas fa-circle-plus"></i>
                                                             </button>
                                                         </div>
                                                     </td>
@@ -315,11 +322,58 @@ requireLogin();
                 <label for="quick-notes">Notes</label>
                 <textarea id="quick-notes" name="quick-notes" rows="4"></textarea>
             </div>
-            <div class="form-actions">
-                <button type="submit" class="btn btn-primary">Add to Tracker</button>
-                <button type="button" class="btn btn-secondary close-quick-tracker">Cancel</button>
+            <div class="d-flex justify-between mt-20">
+                <button type="button" class="btn btn-secondary close-modal">Cancel</button>
+                <button type="submit" class="btn btn-primary">Save</button>
+                
             </div>
         </form>
+    </div>
+</div>
+
+<!-- Bet Slip Modal -->
+<div id="bet-slip-modal" class="modal bet-slip-modal">
+    <div class="modal-content bet-slip-content">
+        <div class="modal-header">
+            <h2>Bet Slip</h2>
+            <span class="close-bet-slip">&times;</span>
+        </div>
+        <div class="bet-slip-details">
+            <div class="bet-slip-race">
+                <div class="bet-slip-label">Race:</div>
+                <div id="bet-slip-course-time" class="bet-slip-value"></div>
+            </div>
+            <div class="bet-slip-selection">
+                <div class="bet-slip-horse-container">
+                    <div class="bet-slip-label">Horse:</div>
+                    <div id="bet-slip-horse-name" class="bet-slip-value horse-name"></div>
+                </div>
+                <div class="bet-slip-jockey-container">
+                    <div class="bet-slip-label">Jockey:</div>
+                    <div id="bet-slip-jockey" class="bet-slip-value"></div>
+                </div>
+                <div class="bet-slip-trainer-container">
+                    <div class="bet-slip-label">Trainer:</div>
+                    <div id="bet-slip-trainer" class="bet-slip-value"></div>
+                </div>
+            </div>
+            <div class="bet-slip-odds">
+                <div class="bet-slip-label">Odds:</div>
+                <div class="bet-slip-value">5/1</div>
+            </div>
+            <div class="bet-slip-stake">
+                <div class="bet-slip-label">Stake (£):</div>
+                <input type="number" class="bet-slip-stake-input" value="5" min="1">
+            </div>
+            <div class="bet-slip-returns">
+                <div class="bet-slip-label">Returns:</div>
+                <div class="bet-slip-value">£30.00</div>
+            </div>
+        </div>
+        <div class="bet-slip-actions">
+            <button type="button" class="btn btn-secondary close-modal">Cancel</button>
+            <button type="button" class="btn btn-primary">Place Bet</button>
+        </div>
     </div>
 </div>
 
@@ -327,6 +381,7 @@ requireLogin();
 
 <script src="race-card.js"></script>
 
-    
+<script src="bet-slip.js"></script>
+
 </body>
 </html>

@@ -61,6 +61,9 @@ if ($_SERVER["REQUEST_METHOD"] == "POST" && isset($_POST['submit'])) {
         $trainer = $_POST['trainer'];
         $outcome = $_POST['outcome'];
         
+        // Get the current user ID from session
+        $user_id = $_SESSION['user_id']; // Assuming user_id is stored in session
+        
         // Handle racecourse (either selected or new)
         $racecourse = $_POST['racecourse'];
         
@@ -92,9 +95,9 @@ if ($_SERVER["REQUEST_METHOD"] == "POST" && isset($_POST['submit'])) {
             }
         }
         
-        // Insert into database using PDO prepared statement
-        $sql = "INSERT INTO bet_records (bet_type, stake, selection, racecourse, odds, jockey, trainer, outcome, returns) 
-                VALUES (:bet_type, :stake, :selection, :racecourse, :odds, :jockey, :trainer, :outcome, :returns)";
+        // Insert into database using PDO prepared statement with user_id
+        $sql = "INSERT INTO bet_records (bet_type, stake, selection, racecourse, odds, jockey, trainer, outcome, returns, user_id) 
+                VALUES (:bet_type, :stake, :selection, :racecourse, :odds, :jockey, :trainer, :outcome, :returns, :user_id)";
                 
         $stmt = $conn->prepare($sql);
         $stmt->bindParam(':bet_type', $bet_type);
@@ -106,6 +109,7 @@ if ($_SERVER["REQUEST_METHOD"] == "POST" && isset($_POST['submit'])) {
         $stmt->bindParam(':trainer', $trainer);
         $stmt->bindParam(':outcome', $outcome);
         $stmt->bindParam(':returns', $returns);
+        $stmt->bindParam(':user_id', $user_id);
         
         $stmt->execute();
         
@@ -121,9 +125,17 @@ if ($_SERVER["REQUEST_METHOD"] == "POST" && isset($_POST['submit'])) {
 
 // Fetch existing records
 try {
+    // Get the current user ID from session
+    $user_id = $_SESSION['user_id']; // Assuming user_id is stored in session
+    
     // SQLite uses different date functions than MySQL
-    $sql = "SELECT *, datetime(date_added) as formatted_date FROM bet_records ORDER BY date_added DESC";
-    $stmt = $conn->query($sql);
+    // Add WHERE clause to only get current user's records
+    $sql = "SELECT *, datetime(date_added) as formatted_date FROM bet_records 
+            WHERE user_id = :user_id 
+            ORDER BY date_added DESC";
+    $stmt = $conn->prepare($sql);
+    $stmt->bindParam(':user_id', $user_id);
+    $stmt->execute();
     $result = $stmt->fetchAll(PDO::FETCH_ASSOC);
     
     // Calculate stats
@@ -165,13 +177,272 @@ $racecourses = fetchRacecourses();
    
 </head>
 
+<style>
+        /* Improved Table Styles */
+        .table {
+            width: 100%;
+            border-collapse: collapse;
+            margin-bottom: 1rem;
+            border-radius: var(--radius-sm);
+            overflow: hidden;
+        }
+        
+        .table th, .table td {
+            padding: 12px 15px;
+            text-align: left;
+            border-bottom: 1px solid var(--border-color);
+        }
+        
+        .table th {
+            background-color: var(--medium-bg);
+            font-weight: 600;
+            color: var(--text-dark);
+            position: sticky;
+            top: 0;
+            z-index: 10;
+            box-shadow: 0 1px 0 var(--border-color);
+        }
+        
+        .table-striped tbody tr:nth-of-type(odd) {
+            background-color: rgba(0, 0, 0, 0.02);
+        }
+        
+        .table-hover tbody tr:hover {
+            background-color: rgba(30, 86, 49, 0.07);
+        }
+        
+        /* Responsive table */
+        @media (max-width: 992px) {
+            .table-responsive {
+                display: block;
+                width: 100%;
+                overflow-x: auto;
+                -webkit-overflow-scrolling: touch;
+            }
+        }
+        
+        /* Status Badge Positioning */
+        td .badge {
+            padding: 5px 10px;
+            display: inline-block;
+            text-align: center;
+            min-width: 70px;
+        }
+        
+        /* Better Modal Scrolling */
+        .modal-dialog {
+            max-height: 90vh;
+            display: flex;
+            flex-direction: column;
+        }
+        
+        .modal-content {
+            max-height: 90vh;
+            display: flex;
+            flex-direction: column;
+        }
+        
+        .modal-body {
+            overflow-y: auto;
+            padding: 1.5rem;
+        }
+        
+        /* Stats cards styling */
+        .stats-card {
+            padding: 1.2rem;
+            border-radius: var(--radius-md);
+            min-width: 120px;
+            background-color: white;
+            box-shadow: var(--shadow-sm);
+            text-align: center;
+            flex: 1 1 0;
+            position: relative;
+            overflow: hidden;
+            border: 1px solid var(--border-color);
+        }
+        
+        .stats-card.total {
+         background: linear-gradient(135deg, #007bff, #0056b3); /* Blue gradient */
+        color: white;
+        }
+
+        .stats-card.wins {
+    background: linear-gradient(135deg, #28a745, #218838); /* Green gradient */
+    color: white;
+        }
+
+        .stats-card.losses {
+    background: linear-gradient(135deg, #dc3545, #a71d2a); /* Red gradient */
+    color: white;
+}
+
+        .stats-card.pending {
+          background: linear-gradient(135deg, #ffc107, #ff9800); /* Amber gradient */
+           color: #333;
+}
+
+
+        .stats-value {
+            font-size: 2.2rem;
+            font-weight: 700;
+            margin-bottom: 5px;
+        }
+        
+        .stats-label {
+            font-size: 1rem;
+            text-transform: uppercase;
+            letter-spacing: 1px;
+            font-weight: 600;
+        }
+        
+        /* Action button styling */
+        .btn-sm {
+            padding: 0.25rem 0.5rem;
+            font-size: 0.875rem;
+        }
+        
+        .text-success {
+            color: #1e5631;
+        }
+        
+        .text-danger {
+            color: #e63946;
+        }
+        
+        /* Financial info in stats */
+        .financial-summary {
+            border-left: 4px solid var(--primary-color);
+            padding-left: 15px;
+        }
+        
+        /* Progress bar */
+        .progress {
+            height: 12px;
+            background-color: #e9ecef;
+            border-radius: 10px;
+            overflow: hidden;
+        }
+        
+        .progress-bar {
+            height: 100%;
+            color: white;
+            text-align: center;
+            background-color: var(--primary-color);
+            transition: width 0.3s ease;
+        }
+        
+        .bg-success {
+            background-color: var(--primary-color) !important;
+        }
+        
+        /* Search and filter styling */
+        .search-container {
+            flex: 1;
+            max-width: 400px;
+        }
+        
+        .input-group {
+            display: flex;
+            position: relative;
+        }
+        
+        .input-group-text {
+            display: flex;
+            align-items: center;
+            padding: 0.375rem 0.75rem;
+            background-color: var(--medium-bg);
+            border: 1px solid var(--border-color);
+            border-right: none;
+            border-top-left-radius: var(--radius-sm);
+            border-bottom-left-radius: var(--radius-sm);
+        }
+        
+        .form-control {
+            flex: 1;
+            border-top-left-radius: 0;
+            border-bottom-left-radius: 0;
+        }
+        
+        /* Filter buttons */
+        .btn-group {
+            display: flex;
+        }
+        
+        .btn-outline-secondary,
+        .btn-outline-success,
+        .btn-outline-danger,
+        .btn-outline-warning {
+            background-color: transparent;
+            padding: 0.375rem 0.75rem;
+        }
+        
+        .btn-outline-secondary {
+            border: 1px solid #6c757d;
+            color: #6c757d;
+        }
+        
+        .btn-outline-success {
+            border: 1px solid #1e5631;
+            color: #1e5631;
+        }
+        
+        .btn-outline-danger {
+            border: 1px solid #e63946;
+            color: #e63946;
+        }
+        
+        .btn-outline-warning {
+            border: 1px solid #f3a712;
+            color: #f3a712;
+        }
+        
+        .btn-outline-secondary:hover, .btn-outline-secondary.active {
+            background-color: #6c757d;
+            color: white;
+        }
+        
+        .btn-outline-success:hover, .btn-outline-success.active {
+            background-color: #1e5631;
+            color: white;
+        }
+        
+        .btn-outline-danger:hover, .btn-outline-danger.active {
+            background-color: #e63946;
+            color: white;
+        }
+        
+        .btn-outline-warning:hover, .btn-outline-warning.active {
+            background-color: #f3a712;
+            color: white;
+        }
+        
+        /* Fix modal footer position */
+        .modal-footer {
+            border-top: 1px solid var(--border-color);
+            padding: 1rem;
+            background-color: var(--medium-bg);
+            display: flex;
+            justify-content: flex-end;
+            gap: 10px;
+        }
+        
+        .d-none {
+            display: none !important;
+        }
+    </style>
+
 <?php include '../test/app-header.php'; ?>
 
 <body>
-    <div class="container mt-20">
+<div class="container mt-20">
+        <div class="d-flex justify-between align-center mb-10">
+            <h2>Bet Record</h2>
+            <p>Track your selections performance</p>
+        </div>    
+
+<div class="container mt-20">
         <div class="card mb-20">
             <div class="card-header">
-                <h2>Bet Records</h2>
                 <div class="d-flex gap-10">
                     <button type="button" class="btn btn-primary" data-bs-toggle="modal" data-bs-target="#addBetModal">
                         <i class="fas fa-plus"></i> Add New Bet
@@ -332,118 +603,111 @@ $racecourses = fetchRacecourses();
     </div>
 
    <!-- Add Bet Modal with racing-themed styling -->
-   <div class="modal fade" id="addBetModal" tabindex="-1" >
-            <div class="modal-content">
-                <div class="modal-header">
-                    <h3 class="modal-title" id="addBetModalLabel">Add New Bet</h3>
-                    <span class="modal-close close-modal">&times;</span>
-                </div>
-                <div class="modal-body">
-                    <form method="post" action="" id="betForm" class="needs-validation" novalidate>
-                        <div class="row mb-3">
-                            <div class="col-md-6">
-                                <label for="bet_type" class="form-label">Bet Type</label>
-                                <select class="form-select" id="bet_type" name="bet_type" required>
-                                    <option value="">Select Bet Type</option>
-                                    <option value="Win">Win</option>
-                                    <option value="Place">Place</option>
-                                    <option value="Each Way">Each Way</option>
-                                    <option value="Forecast">Forecast</option>
-                                    <option value="Tricast">Tricast</option>
-                                    <option value="Accumulator">Accumulator</option>
-                                </select>
-                                <div class="invalid-feedback">Please select a bet type</div>
-                            </div>
-                            <div class="col-md-6">
-                                <label for="stake" class="form-label">Stake (£)</label>
-                                <input type="number" step="0.01" class="form-control" id="stake" name="stake" required>
-                                <div class="invalid-feedback">Please enter stake amount</div>
-                            </div>
+<div class="modal fade" id="addBetModal" tabindex="-1">
+    <div class="modal-dialog modal-dialog-scrollable">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h3 class="modal-title" id="addBetModalLabel">Add New Bet</h3>
+                <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+            </div>
+            <div class="modal-body">
+                <form method="post" action="" id="betForm" class="needs-validation" novalidate>
+                    <div class="row mb-3">
+                        <div class="col-md-6">
+                            <label for="bet_type" class="form-label">Bet Type</label>
+                            <select class="form-select" id="bet_type" name="bet_type" required>
+                                <option value="">Select Bet Type</option>
+                                <option value="Win">Win</option>
+                                <option value="Place">Place</option>
+                                <option value="Each Way">Each Way</option>
+                                <option value="Forecast">Forecast</option>
+                                <option value="Tricast">Tricast</option>
+                                <option value="Accumulator">Accumulator</option>
+                            </select>
+                            <div class="invalid-feedback">Please select a bet type</div>
                         </div>
-                        <div class="row mb-3">
-                            <div class="col-md-6">
-                                <label for="selection" class="form-label">Selection/Horse</label>
-                                <input type="text" class="form-control" id="selection" name="selection" required>
-                                <div class="invalid-feedback">Please enter horse name</div>
-                            </div>
-                            <div class="col-md-6">
-                                <label for="racecourse" class="form-label">Racecourse</label>
-                                <select class="form-select" id="racecourse" name="racecourse" required>
-                                    <option value="">Select Racecourse</option>
-                                    <?php 
-                                    // Check if we got array of arrays (from racecourses table) or just values
-                                    if(!empty($racecourses) && isset($racecourses[0]) && is_array($racecourses[0])) {
-                                        foreach($racecourses as $course): ?>
-                                            <option value="<?php echo htmlspecialchars($course['name']); ?>">
-                                                <?php echo htmlspecialchars($course['name']); ?>
-                                            </option>
-                                        <?php endforeach;
-                                    } else {
-                                        // Simple array of values
-                                        foreach($racecourses as $course): ?>
-                                            <option value="<?php echo htmlspecialchars($course); ?>">
-                                                <?php echo htmlspecialchars($course); ?>
-                                            </option>
-                                        <?php endforeach;
-                                    } ?>
-                                    <option value="other">Other (Add New)</option>
-                                </select>
-                                <div class="invalid-feedback">Please select a racecourse</div>
-                                
-                                <!-- This input will appear when "Other" is selected -->
-                                <div id="newRacecourseContainer" class="mt-2 d-none">
-                                    <input type="text" class="form-control" id="newRacecourse" placeholder="Enter new racecourse">
-                                    <input type="hidden" name="new_racecourse" id="new_racecourse" value="0">
-                                </div>
-                            </div>
+                        <div class="col-md-6">
+                            <label for="stake" class="form-label">Stake (£)</label>
+                            <input type="number" step="0.01" class="form-control" id="stake" name="stake" required>
+                            <div class="invalid-feedback">Please enter stake amount</div>
                         </div>
-                        <div class="row mb-3">
-                            <div class="col-md-4">
-                                <label for="odds" class="form-label">Odds</label>
-                                <input type="text" class="form-control" id="odds" name="odds" placeholder="e.g. 5/1" required>
-                                <div class="invalid-feedback">Please enter odds (e.g. 5/1)</div>
-                            </div>
-                            <div class="col-md-4">
-                                <label for="jockey" class="form-label">Jockey</label>
-                                <input type="text" class="form-control" id="jockey" name="jockey" required>
-                                <div class="invalid-feedback">Please enter Jockey name</div>
-                            </div>
-                            <div class="col-md-4">
-                                <label for="trainer" class="form-label">Trainer</label>
-                                <input type="text" class="form-control" id="trainer" name="trainer" required>
-                                <div class="invalid-feedback">Please enter Trainer name</div>
-                            </div>
+                    </div>
+                    <div class="row mb-3">
+                        <div class="col-md-6">
+                            <label for="selection" class="form-label">Selection/Horse</label>
+                            <input type="text" class="form-control" id="selection" name="selection" required>
+                            <div class="invalid-feedback">Please enter horse name</div>
                         </div>
-                        <div class="row mb-3">
-                            <div class="col-md-6">
-                                <label for="outcome" class="form-label">Outcome</label>
-                                <select class="form-select" id="outcome" name="outcome" required>
-                                    <option value="">Select Outcome</option>
-                                    <option value="Won">Won</option>
-                                    <option value="Lost">Lost</option>
-                                    <option value="Pending">Pending</option>
-                                    <option value="Void">Void</option>
-                                </select>
-                                <div class="invalid-feedback">Please select an outcome</div>
-                            </div>
-                            <div class="col-md-6">
-                                <label class="form-label">Potential Returns</label>
-                                <div class="input-group">
-                                    <span class="input-group-text">£</span>
-                                    <div class="form-control bg-light" id="potentialReturns">0.00</div>
-                                </div>
-                                <small class="text-muted">Based on stake and odds</small>
-                            </div>
+                        <div class="col-md-6">
+                            <label for="racecourse" class="form-label">Racecourse</label>
+                            <input type="text" class="form-control" id="racecourse" name="racecourse" list="racecourseList" autocomplete="off" required>
+                            <datalist id="racecourseList">
+                                <?php 
+                                // Check if we got array of arrays (from racecourses table) or just values
+                                if(!empty($racecourses) && isset($racecourses[0]) && is_array($racecourses[0])) {
+                                    foreach($racecourses as $course): ?>
+                                        <option value="<?php echo htmlspecialchars($course['name']); ?>">
+                                    <?php endforeach;
+                                } else {
+                                    // Simple array of values
+                                    foreach($racecourses as $course): ?>
+                                        <option value="<?php echo htmlspecialchars($course); ?>">
+                                    <?php endforeach;
+                                } ?>
+                            </datalist>
+                            <div class="invalid-feedback">Please enter a racecourse</div>
+                            
+                            <!-- Hidden field to track if this is a new racecourse -->
+                            <input type="hidden" name="new_racecourse" id="new_racecourse" value="0">
                         </div>
-                        <div class="modal-footer">
-                            <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Close</button>
-                            <button type="submit" name="submit" class="btn btn-primary">Save Bet</button>
+                    </div>
+                    <div class="row mb-3">
+                        <div class="col-md-4">
+                            <label for="odds" class="form-label">Odds</label>
+                            <input type="text" class="form-control" id="odds" name="odds" placeholder="e.g. 5/1" required>
+                            <div class="invalid-feedback">Please enter odds (e.g. 5/1)</div>
                         </div>
-                    </form>
-                </div>
+                        <div class="col-md-4">
+                            <label for="jockey" class="form-label">Jockey</label>
+                            <input type="text" class="form-control" id="jockey" name="jockey" required>
+                            <div class="invalid-feedback">Please enter Jockey name</div>
+                        </div>
+                        <div class="col-md-4">
+                            <label for="trainer" class="form-label">Trainer</label>
+                            <input type="text" class="form-control" id="trainer" name="trainer" required>
+                            <div class="invalid-feedback">Please enter Trainer name</div>
+                        </div>
+                    </div>
+                    <div class="row mb-3">
+                        <div class="col-md-6">
+                            <label for="outcome" class="form-label">Outcome</label>
+                            <select class="form-select" id="outcome" name="outcome" required>
+                                <option value="">Select Outcome</option>
+                                <option value="Won">Won</option>
+                                <option value="Lost">Lost</option>
+                                <option value="Pending">Pending</option>
+                                <option value="Void">Void</option>
+                            </select>
+                            <div class="invalid-feedback">Please select an outcome</div>
+                        </div>
+                        <div class="col-md-6">
+                            <label class="form-label">Potential Returns</label>
+                            <div class="input-group">
+                                <span class="input-group-text">£</span>
+                                <div class="form-control bg-light" id="potentialReturns">0.00</div>
+                            </div>
+                            <small class="text-muted">Based on stake and odds</small>
+                        </div>
+                    </div>
+                    <div class="modal-footer">
+                        <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Close</button>
+                        <button type="submit" name="submit" class="btn btn-primary">Save Bet</button>
+                    </div>
+                </form>
             </div>
         </div>
     </div>
+</div>
 
     <?php include '../test/bottom-nav.php'; ?>
 

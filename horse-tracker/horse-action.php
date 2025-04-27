@@ -37,19 +37,33 @@ if ($action === 'add') {
     try {
         $db = getDbConnection();
         
-        // Prepare SQL statement with user_id
-        $stmt = $db->prepare("
-            INSERT INTO horse_tracker 
-            (horse_name, trainer, notes, date_added, user_id) 
-            VALUES 
-            (:name, :trainer, :notes, datetime('now'), :user_id)
-        ");
+        // Check if horse_id was provided
+        $includeHorseId = !empty($_POST['horse_id']);
         
-        // Bind parameters
+        // Prepare SQL statement based on whether horse_id was provided
+        if ($includeHorseId) {
+            $stmt = $db->prepare("
+                INSERT INTO horse_tracker 
+                (horse_name, trainer, notes, date_added, user_id, horse_id, silk_url) 
+                VALUES 
+                (:name, :trainer, :notes, datetime('now'), :user_id, :horse_id, :silk_url)
+            ");
+            $stmt->bindParam(':horse_id', $_POST['horse_id']);
+        } else {
+            $stmt = $db->prepare("
+                INSERT INTO horse_tracker 
+                (horse_name, trainer, notes, date_added, user_id, silk_url) 
+                VALUES 
+                (:name, :trainer, :notes, datetime('now'), :user_id, :silk_url)
+            ");
+        }
+        
+        // Bind other parameters
         $stmt->bindParam(':name', $_POST['name']);
         $stmt->bindParam(':trainer', $_POST['trainer']);
         $stmt->bindParam(':notes', $_POST['last_run_notes']);
         $stmt->bindParam(':user_id', $user_id, PDO::PARAM_INT);
+        $stmt->bindParam(':silk_url', $_POST['silk_url']);
         
         // Execute the statement
         $stmt->execute();
@@ -59,6 +73,7 @@ if ($action === 'add') {
         echo json_encode(['success' => false, 'message' => 'Database error: ' . $e->getMessage()]);
     }
 }
+
 // Handle Update Horse
 else if ($action === 'update') {
     // Check for horse ID
@@ -81,12 +96,13 @@ else if ($action === 'update') {
             exit;
         }
         
-        // Prepare SQL statement (fix the SQL syntax by removing the trailing comma)
+        // Prepare SQL statement
         $stmt = $db->prepare("
             UPDATE horse_tracker SET
             horse_name = :name,
             trainer = :trainer,
-            notes = :notes
+            notes = :notes,
+            silk_url = :silk_url
             WHERE id = :id AND user_id = :user_id
         ");
         
@@ -95,6 +111,7 @@ else if ($action === 'update') {
         $stmt->bindParam(':name', $_POST['name']);
         $stmt->bindParam(':trainer', $_POST['trainer']);
         $stmt->bindParam(':notes', $_POST['last_run_notes']);
+        $stmt->bindParam(':silk_url', $_POST['silk_url']);
         $stmt->bindParam(':user_id', $user_id, PDO::PARAM_INT);
         
         // Execute the statement

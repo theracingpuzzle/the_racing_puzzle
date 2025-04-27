@@ -46,7 +46,8 @@ if ($id) {
                 'last_run_notes' => $horse['notes'] ?? '',
                 'notify' => $horse['notify'] ?? '1',
                 'date_added' => $horse['date_added'] ?? '',
-                'user_id' => $horse['user_id']
+                'user_id' => $horse['user_id'],
+                'silk_url' => $horse['silk_url'] ?? '' // Add the silk_url field
             ];
             
             echo json_encode(['success' => true, 'horse' => $horse]);

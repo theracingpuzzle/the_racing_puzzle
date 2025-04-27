@@ -36,20 +36,26 @@ requireLogin();
             </div>
             
             <!-- Stats Cards -->
+
+            <?php include 'total-bets-stats.php'; ?>
+
             <div class="d-flex flex-wrap gap-20 mb-20">
                 <div class="card" style="flex: 1; min-width: 250px;">
-                    <div class="card-body">
-                        <div class="d-flex justify-between align-center">
-                            <div>
-                                <h6>Total Bets</h6>
-                                <h3>254</h3>
-                                <small><i class="fas fa-arrow-up"></i> 12% from last month</small>
-                            </div>
-                            <div>
-                                <i class="fas fa-flag-checkered fa-lg"></i>
-                            </div>
-                        </div>
-                    </div>
+                <div class="card-body">
+        <div class="d-flex justify-between align-center">
+            <div>
+                <h6>Total Bets</h6>
+                <h3><?php echo $totalBets; ?></h3>
+                <small class="<?php echo $isIncrease ? 'text-success' : 'text-danger'; ?>">
+                    <i class="fas <?php echo $isIncrease ? 'fa-arrow-up' : 'fa-arrow-down'; ?>"></i> 
+                    <?php echo abs($percentChange); ?>% from last month
+                </small>
+            </div>
+            <div>
+                <i class="fas fa-flag-checkered fa-lg"></i>
+            </div>
+        </div>
+    </div>
                 </div>
 
                 <?php include 'best-jockey-stats.php'; ?>
@@ -108,110 +114,98 @@ requireLogin();
                     </div>
                 </div>
             </div>
+
+            <!-- ROI and Performance Card -->
+
+            <?php include 'roi-stats.php'; ?>
+
+<div class="card" style="flex: 1; min-width: 250px;">
+    <div class="card-body">
+        <div class="d-flex justify-between align-center">
+            <div>
+                <h6>Overall ROI</h6>
+                <h3><?php echo number_format($overallROI, 1); ?>%</h3>
+                <small class="<?php echo $roiTrend >= 0 ? 'text-success' : 'text-danger'; ?>">
+                    <i class="fas <?php echo $roiTrend >= 0 ? 'fa-arrow-up' : 'fa-arrow-down'; ?>"></i> 
+                    <?php echo abs($roiTrend); ?>% from last month
+                </small>
+            </div>
+            <div>
+                <i class="fas fa-chart-line fa-lg"></i>
+            </div>
+        </div>
+    </div>
+</div>
             
             <!-- Main Dashboard Content -->
             <div class="d-flex flex-wrap gap-20">
-                <!-- Recent Activity Table -->
-                <div style="flex: 2; min-width: 300px;">
-                    <div class="card">
-                        <div class="card-header">
-                            <h5>Recent Activity</h5>
-                            <div>
-                                <button class="btn btn-secondary">
-                                    <i class="fas fa-ellipsis-v"></i>
-                                </button>
-                            </div>
-                        </div>
-                        <div class="card-body">
-                            <div>
-                                <table style="width: 100%; border-collapse: collapse;">
-                                    <thead>
-                                        <tr>
-                                            <th style="text-align: left; padding: 10px;">Race</th>
-                                            <th style="text-align: left; padding: 10px;">Date</th>
-                                            <th style="text-align: left; padding: 10px;">Position</th>
-                                            <th style="text-align: left; padding: 10px;">Prize Money</th>
-                                            <th style="text-align: left; padding: 10px;">Action</th>
-                                        </tr>
-                                    </thead>
-                                    <tbody>
-                                        <tr>
-                                            <td style="padding: 10px;">
-                                                <div class="d-flex align-center">
-                                                    <div style="width: 32px; height: 32px; background-color: var(--border-color); border-radius: 4px; margin-right: 10px;"></div>
-                                                    <div>
-                                                        <h6 style="margin: 0;">Cheltenham Gold Cup</h6>
-                                                        <small>Cheltenham</small>
-                                                    </div>
-                                                </div>
-                                            </td>
-                                            <td style="padding: 10px;">Mar 25, 2025</td>
-                                            <td style="padding: 10px;"><span class="badge badge-success">1st</span></td>
-                                            <td style="padding: 10px;">£250,000</td>
-                                            <td style="padding: 10px;">
-                                                <button class="btn btn-primary">View</button>
-                                            </td>
-                                        </tr>
-                                        <tr>
-                                            <td style="padding: 10px;">
-                                                <div class="d-flex align-center">
-                                                    <div style="width: 32px; height: 32px; background-color: var(--border-color); border-radius: 4px; margin-right: 10px;"></div>
-                                                    <div>
-                                                        <h6 style="margin: 0;">Grand National</h6>
-                                                        <small>Aintree</small>
-                                                    </div>
-                                                </div>
-                                            </td>
-                                            <td style="padding: 10px;">Mar 22, 2025</td>
-                                            <td style="padding: 10px;"><span class="badge badge-info">4th</span></td>
-                                            <td style="padding: 10px;">£50,000</td>
-                                            <td style="padding: 10px;">
-                                                <button class="btn btn-primary">View</button>
-                                            </td>
-                                        </tr>
-                                        <tr>
-                                            <td style="padding: 10px;">
-                                                <div class="d-flex align-center">
-                                                    <div style="width: 32px; height: 32px; background-color: var(--border-color); border-radius: 4px; margin-right: 10px;"></div>
-                                                    <div>
-                                                        <h6 style="margin: 0;">Royal Ascot</h6>
-                                                        <small>Ascot</small>
-                                                    </div>
-                                                </div>
-                                            </td>
-                                            <td style="padding: 10px;">Mar 19, 2025</td>
-                                            <td style="padding: 10px;"><span class="badge badge-warning">2nd</span></td>
-                                            <td style="padding: 10px;">£120,000</td>
-                                            <td style="padding: 10px;">
-                                                <button class="btn btn-primary">View</button>
-                                            </td>
-                                        </tr>
-                                        <tr>
-                                            <td style="padding: 10px;">
-                                                <div class="d-flex align-center">
-                                                    <div style="width: 32px; height: 32px; background-color: var(--border-color); border-radius: 4px; margin-right: 10px;"></div>
-                                                    <div>
-                                                        <h6 style="margin: 0;">Epsom Derby</h6>
-                                                        <small>Epsom</small>
-                                                    </div>
-                                                </div>
-                                            </td>
-                                            <td style="padding: 10px;">Mar 15, 2025</td>
-                                            <td style="padding: 10px;"><span class="badge badge-danger">DNF</span></td>
-                                            <td style="padding: 10px;">£0</td>
-                                            <td style="padding: 10px;">
-                                                <button class="btn btn-primary">View</button>
-                                            </td>
-                                        </tr>
-                                    </tbody>
-                                </table>
-                            </div>
-                        </div>
-                        <div class="card-footer text-center">
-                            <a href="#">View All Activities</a>
+            <?php include 'recent-activity.php'; ?>
+
+<div style="flex: 2; min-width: 300px;">
+    <div class="card">
+        <div class="card-header">
+            <h5>Recent Activity</h5>
+            <div>
+                <button class="btn btn-secondary">
+                    <i class="fas fa-ellipsis-v"></i>
+                </button>
+            </div>
+        </div>
+        <div class="card-body">
+            <div>
+                <table style="width: 100%; border-collapse: collapse;">
+                    <thead>
+                        <tr>
+                            <th style="text-align: left; padding: 10px;">Race</th>
+                            <th style="text-align: left; padding: 10px;">Date</th>
+                            <th style="text-align: left; padding: 10px;">Position</th>
+                            <th style="text-align: left; padding: 10px;">Return</th>
+                            <th style="text-align: left; padding: 10px;">Action</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+    <?php if (!empty($recentActivity)): ?>
+        <?php foreach ($recentActivity as $activity): ?>
+            <tr>
+                <td style="padding: 10px;">
+                    <div class="d-flex align-center">
+                        <div style="width: 32px; height: 32px; background-color: var(--border-color); border-radius: 4px; margin-right: 10px;"></div>
+                        <div>
+                            <h6 style="margin: 0;"><?= htmlspecialchars($activity['selection']) ?></h6>
+                            <small><?= htmlspecialchars($activity['racecourse']) ?></small>
                         </div>
                     </div>
-                </div>
+                </td>
+                <td style="padding: 10px;"><?= date('M d, Y', strtotime($activity['date_added'])) ?></td>
+                <td style="padding: 10px;">
+                    <?php
+                    $badgeClass = 'badge-danger';
+                    if ($activity['outcome'] == 'Won') $badgeClass = 'badge-success';
+                    else if ($activity['outcome'] == 'Placed') $badgeClass = 'badge-warning';
+                    else if ($activity['outcome'] == 'Void') $badgeClass = 'badge-info';
+                    ?>
+                    <span class="badge <?= $badgeClass ?>"><?= htmlspecialchars($activity['outcome']) ?></span>
+                </td>
+                <td style="padding: 10px;">£<?= number_format($activity['returns'], 2) ?></td>
+                <td style="padding: 10px;">
+                    <a href="view-bet.php?id=<?= $activity['bet_id'] ?>" class="btn btn-primary">View</a>
+                </td>
+            </tr>
+        <?php endforeach; ?>
+    <?php else: ?>
+        <tr>
+            <td colspan="5" style="text-align: center; padding: 20px;">No recent activity found.</td>
+        </tr>
+    <?php endif; ?>
+</tbody>
+                </table>
+            </div>
+        </div>
+        <div class="card-footer text-center">
+            <a href="activity-history.php">View All Activities</a>
+        </div>
+    </div>
+</div>
                 
                 <!-- Upcoming Events -->
                 <div style="flex: 1; min-width: 300px;">

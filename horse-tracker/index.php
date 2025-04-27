@@ -98,19 +98,15 @@ requireLogin();
                     <input type="text" id="horse-trainer">
                 </div>
                 <div class="form-group">
-                    <label for="next-race-date">Next Race Date:</label>
-                    <input type="datetime-local" id="next-race-date">
-                </div>
-                <div class="form-group">
                     <label for="last-run-notes">Last Run Notes:</label>
                     <textarea id="last-run-notes" rows="4"></textarea>
                 </div>
-                <div class="form-group">
+                <!-- <div class="form-group">
                     <label for="notification" style="display: flex; align-items: center; gap: 8px;">
                         <input type="checkbox" id="notification" checked style="width: auto;">
                         Notify for next race
                     </label>
-                </div>
+                </div> -->
                 <div class="d-flex justify-between mt-20">
                     <button type="button" class="btn btn-secondary close-modal">Cancel</button>
                     <button type="submit" class="btn btn-primary">Save Horse</button>
@@ -294,7 +290,7 @@ requireLogin();
                 formData.append('action', 'delete');
                 formData.append('id', horseId);
                 
-                fetch('horse-actions.php', {
+                fetch('horse-action.php', {
                     method: 'POST',
                     body: formData
                 })

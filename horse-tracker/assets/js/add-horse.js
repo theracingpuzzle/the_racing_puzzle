@@ -81,7 +81,7 @@ function handleFormSubmit(e) {
     const horseName = document.getElementById('horse-name').value;
     const trainer = document.getElementById('trainer').value;
     const jockey = document.getElementById('jockey').value;
-    const nextRaceDate = document.getElementById('next-race-date').value;
+    // const nextRaceDate = document.getElementById('next-race-date').value;
     const lastRunNotes = document.getElementById('last-run-notes').value;
     const notify = document.getElementById('notification').checked;
     
@@ -219,28 +219,6 @@ function toggleNotification(id) {
     }
 }
 
-// Edit a horse
-function editHorse(id) {
-    const horse = getHorseById(id);
-    
-    if (horse) {
-        document.getElementById('horse-name').value = horse.name;
-        document.getElementById('trainer').value = horse.trainer || '';
-        document.getElementById('jockey').value = horse.jockey || '';
-        document.getElementById('next-race-date').value = horse.nextRaceDate || '';
-        document.getElementById('last-run-notes').value = horse.lastRunNotes || '';
-        document.getElementById('notification').checked = horse.notify;
-        
-        // Change button text
-        document.querySelector('button[type="submit"]').textContent = 'Update Horse';
-        
-        // Set editing state
-        editingHorseId = id;
-        
-        // Scroll to form
-        document.querySelector('.add-horse-section').scrollIntoView({ behavior: 'smooth' });
-    }
-}
 
 // Filter horses based on search input
 function filterHorses() {
@@ -338,31 +316,3 @@ function checkForUpcomingRaces() {
     }
 }
 
-// Request notification permission
-function requestNotificationPermission() {
-    if (!("Notification" in window)) {
-        alert("This browser does not support desktop notifications");
-        return;
-    }
-    
-    Notification.requestPermission().then(permission => {
-        if (permission === "granted") {
-            alert("You will now receive notifications for upcoming races!");
-        }
-    });
-}
-
-// Check if browser supports notifications and request permission
-if ("Notification" in window) {
-    document.addEventListener('DOMContentLoaded', () => {
-        // Add notification permission button
-        const addHorseSection = document.querySelector('.add-horse-section');
-        const permissionBtn = document.createElement('button');
-        permissionBtn.className = 'btn';
-        permissionBtn.style.marginLeft = '10px';
-        permissionBtn.textContent = 'Enable Notifications';
-        permissionBtn.addEventListener('click', requestNotificationPermission);
-        
-        document.querySelector('button[type="submit"]').after(permissionBtn);
-    });
-}

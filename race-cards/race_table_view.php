@@ -49,7 +49,13 @@
                     </td>
                     <td class="actions-col">
                         <div class="table-actions">
-                            <button class="table-action-btn" title="Add to Tracker">
+                            <button class="table-action-btn"
+                            onclick="openQuickTracker(
+            '<?php echo addslashes($runner['name']); ?>', 
+            '<?php echo addslashes($runner['jockey']); ?>', 
+            '<?php echo addslashes($runner['trainer']); ?>'
+        )"
+    >
                                 <i class="far fa-star"></i>
                             </button>
                             <button class="table-action-btn" title="Runner Details">
@@ -257,6 +263,7 @@
     }
 }
 </style>
+
 
 <script>
 /**
