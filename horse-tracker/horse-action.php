@@ -85,34 +85,43 @@ else if ($action === 'update') {
     try {
         $db = getDbConnection();
         
-        // First check if the horse belongs to the user
-        $checkStmt = $db->prepare("SELECT id FROM horse_tracker WHERE id = :id AND user_id = :user_id");
-        $checkStmt->bindParam(':id', $_POST['id'], PDO::PARAM_INT);
-        $checkStmt->bindParam(':user_id', $user_id, PDO::PARAM_INT);
-        $checkStmt->execute();
+        // Cast both values to integers to avoid type comparison issues
+        $horse_id = (int)$_POST['id'];
+        $current_user = (int)$user_id;
         
-        if ($checkStmt->rowCount() === 0) {
-            echo json_encode(['success' => false, 'message' => 'Horse not found or access denied']);
+        // First check if the horse exists at all - temporarily skip user check
+        $horse_check = $db->prepare("SELECT id, user_id FROM horse_tracker WHERE id = :id");
+        $horse_check->bindValue(':id', $horse_id, PDO::PARAM_INT);
+        $horse_check->execute();
+        $horse_data = $horse_check->fetch(PDO::FETCH_ASSOC);
+        
+        if (!$horse_data) {
+            echo json_encode(['success' => false, 'message' => 'Horse ID ' . $horse_id . ' not found in database']);
             exit;
         }
         
-        // Prepare SQL statement
+        // Check if user IDs match
+        $db_user_id = (int)$horse_data['user_id'];
+        if ($db_user_id !== $current_user) {
+            echo json_encode(['success' => false, 'message' => 'Access denied - Horse belongs to user ' . $db_user_id . ' but you are user ' . $current_user]);
+            exit;
+        }
+        
+        // Proceed with update now that we've verified ownership
         $stmt = $db->prepare("
             UPDATE horse_tracker SET
             horse_name = :name,
             trainer = :trainer,
-            notes = :notes,
-            silk_url = :silk_url
-            WHERE id = :id AND user_id = :user_id
+            notes = :notes
+            WHERE id = :id
         ");
         
-        // Bind parameters
-        $stmt->bindParam(':id', $_POST['id']);
-        $stmt->bindParam(':name', $_POST['name']);
-        $stmt->bindParam(':trainer', $_POST['trainer']);
-        $stmt->bindParam(':notes', $_POST['last_run_notes']);
-        $stmt->bindParam(':silk_url', $_POST['silk_url']);
-        $stmt->bindParam(':user_id', $user_id, PDO::PARAM_INT);
+        // Bind parameters - simplified to avoid user_id issues
+        $stmt->bindValue(':id', $horse_id, PDO::PARAM_INT);
+        $stmt->bindValue(':name', $_POST['name']);
+        $stmt->bindValue(':trainer', $_POST['trainer']);
+        $stmt->bindValue(':notes', $_POST['last_run_notes']);
+        
         
         // Execute the statement
         $stmt->execute();
@@ -122,61 +131,6 @@ else if ($action === 'update') {
         echo json_encode(['success' => false, 'message' => 'Database error: ' . $e->getMessage()]);
     }
 }
-// Handle Delete Horse
-else if ($action === 'delete') {
-    // Check for horse ID
-    if (!isset($_POST['id']) || empty($_POST['id'])) {
-        echo json_encode(['success' => false, 'message' => 'Horse ID is required for deletion']);
-        exit;
-    }
-    
-    try {
-        $db = getDbConnection();
-        
-        // First check if the horse belongs to the user
-        $checkStmt = $db->prepare("SELECT id FROM horse_tracker WHERE id = :id AND user_id = :user_id");
-        $checkStmt->bindParam(':id', $_POST['id'], PDO::PARAM_INT);
-        $checkStmt->bindParam(':user_id', $user_id, PDO::PARAM_INT);
-        $checkStmt->execute();
-        
-        if ($checkStmt->rowCount() === 0) {
-            echo json_encode(['success' => false, 'message' => 'Horse not found or access denied']);
-            exit;
-        }
-        
-        // Prepare SQL statement
-        $stmt = $db->prepare("DELETE FROM horse_tracker WHERE id = :id AND user_id = :user_id");
-        
-        // Bind parameters
-        $stmt->bindParam(':id', $_POST['id']);
-        $stmt->bindParam(':user_id', $user_id, PDO::PARAM_INT);
-        
-        // Execute the statement
-        $stmt->execute();
-        
-        echo json_encode(['success' => true, 'message' => 'Horse deleted successfully']);
-    } catch (PDOException $e) {
-        echo json_encode(['success' => false, 'message' => 'Database error: ' . $e->getMessage()]);
-    }
-}
-// Get horses
-else if ($action === 'get') {
-    $sort = isset($_POST['sort']) ? $_POST['sort'] : 'name';
-    $horses = getAllHorses($user_id, $sort);
-    echo json_encode(['success' => true, 'horses' => $horses]);
-}
-// Search horses
-else if ($action === 'search') {
-    if (!isset($_POST['search']) || empty($_POST['search'])) {
-        echo json_encode(['success' => false, 'message' => 'Search term is required']);
-        exit;
-    }
-    
-    $horses = searchHorses($user_id, $_POST['search']);
-    echo json_encode(['success' => true, 'horses' => $horses]);
-}
-// Unknown action
-else {
-    echo json_encode(['success' => false, 'message' => 'Unknown action: ' . $action]);
-}
+
+
 ?>

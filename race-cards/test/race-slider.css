@@ -1,0 +1,209 @@
+/* Race Slider Styles */
+.race-times-slider {
+    padding: 15px 20px;
+    background-color: #f8fafc;
+    border-bottom: 1px solid #e2e8f0;
+    overflow-x: auto;
+    -webkit-overflow-scrolling: touch;
+}
+
+.race-times-container {
+    display: flex;
+    gap: 12px;
+    padding-bottom: 5px;
+}
+
+.race-time-item {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
+    min-width: 60px;
+    height: 60px;
+    padding: 10px;
+    border-radius: 8px;
+    background-color: #fff;
+    border: 1px solid #e2e8f0;
+    cursor: pointer;
+    transition: all 0.2s ease;
+}
+
+.race-time-item:hover {
+    border-color: #cbd5e0;
+    transform: translateY(-2px);
+    box-shadow: 0 2px 4px rgba(0, 0, 0, 0.05);
+}
+
+.race-time-item.active {
+    background-color: #ebf8ff;
+    border-color: #63b3ed;
+    transform: scale(1.05);
+    box-shadow: 0 2px 6px rgba(0, 0, 0, 0.1);
+}
+
+.race-time {
+    font-size: 18px;
+    font-weight: 600;
+    color: #2d3748;
+}
+
+/* Race Card Header */
+.race-card-header {
+    display: flex;
+    flex-wrap: wrap;
+    justify-content: space-between;
+    padding: 15px 20px;
+    border-bottom: 1px solid #e2e8f0;
+    background-color: #fff;
+}
+
+.race-header-left {
+    flex: 1;
+    min-width: 300px;
+    margin-right: 15px;
+    margin-bottom: 10px;
+}
+
+.race-name {
+    margin: 0 0 8px;
+    font-size: 16px;
+    font-weight: 600;
+    color: #2d3748;
+}
+
+.race-classifications {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 8px;
+}
+
+.race-class,
+.race-type,
+.race-age-band {
+    display: inline-block;
+    padding: 4px 8px;
+    border-radius: 4px;
+    font-size: 12px;
+    font-weight: 500;
+}
+
+.race-class {
+    background-color: #ebf8ff;
+    color: #2b6cb0;
+}
+
+.race-type {
+    background-color: #e9d8fd;
+    color: #6b46c1;
+}
+
+.race-age-band {
+    background-color: #fed7d7;
+    color: #c53030;
+}
+
+.race-header-right {
+    display: flex;
+    flex-direction: column;
+    gap: 10px;
+    min-width: 200px;
+}
+
+.race-conditions {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 12px;
+    font-size: 14px;
+    color: #4a5568;
+}
+
+.race-distance i,
+.race-surface i,
+.race-going i {
+    margin-right: 5px;
+}
+
+.race-prize {
+    font-size: 14px;
+    font-weight: 600;
+    color: #2d3748;
+}
+
+.race-prize i {
+    color: #f6ad55;
+    margin-right: 5px;
+}
+
+/* Show Runners Toggle */
+.show-runners-toggle {
+    padding: 10px 20px;
+    border-bottom: 1px solid #e2e8f0;
+    background-color: #f8fafc;
+}
+
+.show-runners-btn {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    width: 100%;
+    padding: 10px;
+    background-color: #fff;
+    border: 1px solid #e2e8f0;
+    border-radius: 6px;
+    font-size: 14px;
+    font-weight: 500;
+    color: #4a5568;
+    cursor: pointer;
+    transition: all 0.2s;
+}
+
+.show-runners-btn i {
+    margin-right: 8px;
+}
+
+.runner-count {
+    margin-left: 5px;
+    color: #718096;
+}
+
+.show-runners-btn:hover {
+    background-color: #edf2f7;
+    border-color: #cbd5e0;
+}
+
+.show-runners-btn.active {
+    background-color: #ebf4ff;
+    border-color: #4299e1;
+    color: #2b6cb0;
+}
+
+/* Race Details Container */
+.race-details {
+    border-bottom: 1px solid #e2e8f0;
+}
+
+/* Responsive adjustments */
+@media (max-width: 768px) {
+    .race-card-header {
+        flex-direction: column;
+    }
+    
+    .race-header-left {
+        margin-right: 0;
+        margin-bottom: 15px;
+    }
+    
+    .race-header-right {
+        width: 100%;
+    }
+    
+    .race-time-item {
+        min-width: 50px;
+        height: 50px;
+        padding: 8px;
+    }
+    
+    .race-time {
+        font-size: 16px;
+    }
+}

@@ -1,0 +1,328 @@
+/* Enhanced Table UI Styles */
+
+/* Modern table styling */
+.modern-table {
+    width: 100%;
+    border-collapse: separate;
+    border-spacing: 0;
+    margin-bottom: 1.5rem;
+    border-radius: 8px;
+    overflow: hidden;
+    box-shadow: 0 2px 12px rgba(0, 0, 0, 0.08);
+    background: white;
+}
+
+.modern-table thead th {
+    background: linear-gradient(to bottom, #f8f9fa, #e9ecef);
+    color: #343a40;
+    font-weight: 600;
+    text-transform: uppercase;
+    letter-spacing: 0.5px;
+    font-size: 0.85rem;
+    padding: 15px;
+    border-bottom: 2px solid #dee2e6;
+    position: sticky;
+    top: 0;
+    z-index: 10;
+    box-shadow: 0 1px 0 rgba(0,0,0,0.1);
+}
+
+.modern-table tbody tr {
+    transition: all 0.2s ease;
+}
+
+.modern-table tbody tr:nth-child(even) {
+    background-color: #f8f9fa;
+}
+
+.modern-table tbody tr:hover {
+    background-color: rgba(30, 86, 49, 0.1);
+    transform: translateY(-2px);
+    box-shadow: 0 4px 6px rgba(0, 0, 0, 0.06);
+}
+
+.modern-table td {
+    padding: 12px 15px;
+    border-bottom: 1px solid #e9ecef;
+    vertical-align: middle;
+}
+
+.modern-table tbody tr:last-child td {
+    border-bottom: none;
+}
+
+/* Column-specific styling */
+.modern-table .col-date {
+    white-space: nowrap;
+    width: 120px;
+}
+
+.modern-table .col-actions {
+    width: 100px;
+    text-align: right;
+}
+
+.modern-table .col-outcome {
+    width: 100px;
+    text-align: center;
+}
+
+.modern-table .col-stake, 
+.modern-table .col-odds {
+    width: 80px;
+    text-align: right;
+}
+
+/* Enhanced badge styling */
+.modern-badge {
+    display: inline-block;
+    padding: 6px 12px;
+    border-radius: 50px;
+    font-weight: 600;
+    font-size: 0.8rem;
+    text-align: center;
+    letter-spacing: 0.5px;
+    white-space: nowrap;
+    box-shadow: 0 1px 3px rgba(0,0,0,0.1);
+    transition: all 0.2s ease;
+}
+
+.modern-badge.badge-won {
+    background-color: #1e5631;
+    color: white;
+}
+
+.modern-badge.badge-lost {
+    background-color: #e63946;
+    color: white;
+}
+
+.modern-badge.badge-pending {
+    background-color: #f3a712;
+    color: #333;
+}
+
+.modern-badge.badge-void {
+    background-color: #6c757d;
+    color: white;
+}
+
+/* Improved action buttons */
+.action-buttons {
+    display: flex;
+    justify-content: flex-end;
+    gap: 5px;
+}
+
+.action-btn {
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    width: 36px;
+    height: 36px;
+    border-radius: 50%;
+    border: none;
+    color: white;
+    background-color: #495057;
+    transition: all 0.2s ease;
+    cursor: pointer;
+    box-shadow: 0 2px 4px rgba(0,0,0,0.1);
+}
+
+.action-btn:hover {
+    transform: translateY(-2px);
+    box-shadow: 0 4px 8px rgba(0,0,0,0.15);
+}
+
+.action-btn.edit-btn {
+    background-color: #0077b6;
+}
+
+.action-btn.delete-btn {
+    background-color: #e63946;
+}
+
+.action-btn i {
+    font-size: 1rem;
+}
+
+/* Responsive table enhancements */
+@media (max-width: 992px) {
+    .modern-table thead {
+        display: none;
+    }
+    
+    .modern-table tbody tr {
+        display: block;
+        margin-bottom: 1rem;
+        border: 1px solid #dee2e6;
+        border-radius: 8px;
+        padding: 1rem;
+        box-shadow: 0 2px 5px rgba(0,0,0,0.08);
+    }
+    
+    .modern-table tbody td {
+        display: flex;
+        justify-content: space-between;
+        align-items: center;
+        padding: 0.75rem 0;
+        border-bottom: 1px solid #f1f1f1;
+    }
+    
+    .modern-table tbody td:last-child {
+        border-bottom: none;
+    }
+    
+    .modern-table tbody td:before {
+        content: attr(data-label);
+        font-weight: 600;
+        color: #495057;
+        width: 40%;
+        text-align: left;
+    }
+    
+    .modern-table .col-actions {
+        justify-content: flex-end;
+    }
+    
+    .modern-table .col-actions:before {
+        display: none;
+    }
+}
+
+/* Highlight effect for updated rows */
+@keyframes highlight-row {
+    0% { background-color: rgba(30, 86, 49, 0.3); }
+    100% { background-color: transparent; }
+}
+
+.row-highlight {
+    animation: highlight-row 2s ease-in-out;
+}
+
+/* Quick outcome update buttons */
+.quick-update {
+    display: flex;
+    gap: 5px;
+    margin-top: 5px;
+}
+
+.quick-update button {
+    border: none;
+    border-radius: 4px;
+    padding: 3px 8px;
+    font-size: 0.7rem;
+    font-weight: 600;
+    cursor: pointer;
+    transition: all 0.2s;
+}
+
+.quick-update .quick-won {
+    background-color: rgba(30, 86, 49, 0.2);
+    color: #1e5631;
+}
+
+.quick-update .quick-lost {
+    background-color: rgba(230, 57, 70, 0.2);
+    color: #e63946;
+}
+
+.quick-update button:hover {
+    transform: translateY(-1px);
+    box-shadow: 0 2px 4px rgba(0,0,0,0.1);
+}
+
+/* Racecourse badges */
+.racecourse-badge {
+    background-color: #e9ecef;
+    color: #495057;
+    padding: 3px 8px;
+    border-radius: 4px;
+    font-size: 0.8rem;
+    display: inline-block;
+}
+
+/* Custom scrollbar for table container */
+.table-responsive::-webkit-scrollbar {
+    height: 6px;
+    width: 6px;
+}
+
+.table-responsive::-webkit-scrollbar-track {
+    background: #f1f1f1;
+    border-radius: 10px;
+}
+
+.table-responsive::-webkit-scrollbar-thumb {
+    background: #c1c1c1;
+    border-radius: 10px;
+}
+
+.table-responsive::-webkit-scrollbar-thumb:hover {
+    background: #a8a8a8;
+}
+
+/* Enhanced mobile cards */
+.bet-card {
+    transition: all 0.3s ease;
+    border: none;
+    box-shadow: 0 4px 12px rgba(0,0,0,0.08);
+}
+
+.bet-card:hover {
+    transform: translateY(-3px);
+    box-shadow: 0 8px 16px rgba(0,0,0,0.12);
+}
+
+.bet-card-header {
+    background: linear-gradient(to right, #f8f9fa, #e9ecef);
+    border-bottom: 2px solid var(--border-color);
+}
+
+.bet-date {
+    font-weight: 600;
+    color: #495057;
+}
+
+.bet-card .badge {
+    padding: 5px 12px;
+    border-radius: 50px;
+    font-weight: 600;
+}
+
+.bet-label {
+    color: #6c757d;
+    font-weight: 500;
+}
+
+.bet-value {
+    font-weight: 600;
+}
+
+/* Button to quickly toggle between table and card view */
+.view-toggle {
+    margin-bottom: 1rem;
+    text-align: right;
+}
+
+.view-toggle button {
+    background: transparent;
+    border: 1px solid var(--border-color);
+    border-radius: 4px;
+    padding: 5px 10px;
+    margin-left: 5px;
+    cursor: pointer;
+    transition: all 0.2s;
+}
+
+.view-toggle button.active {
+    background-color: var(--primary-color);
+    color: white;
+    border-color: var(--primary-color);
+}
+
+/* Quick outcome update in mobile view */
+.bet-card .quick-update {
+    margin-top: 10px;
+    justify-content: center;
+}

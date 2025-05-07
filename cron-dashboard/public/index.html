@@ -1,0 +1,126 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Python Script Status Dashboard</title>
+    <link rel="stylesheet" href="styles.css">
+</head>
+<body>
+    <div class="container">
+        <header>
+            <h1>Python Script Status Dashboard</h1>
+            <div class="actions">
+                <button id="run-job" class="btn primary">Run Script Now</button>
+                <button id="refresh" class="btn secondary">Refresh Data</button>
+                <button id="show-schedule" class="btn secondary">Manage Schedule</button>
+            </div>
+        </header>
+
+        <div class="status-cards">
+            <div class="card">
+                <h3>Last Run Status</h3>
+                <div id="last-status" class="status-indicator">Unknown</div>
+                <div id="last-time">Never</div>
+            </div>
+            <div class="card">
+                <h3>Total Runs</h3>
+                <div id="total-runs" class="metric">0</div>
+            </div>
+            <div class="card">
+                <h3>Success Rate</h3>
+                <div id="success-rate" class="metric">0%</div>
+            </div>
+        </div>
+
+        <div class="section">
+            <h2>Run History</h2>
+            <div class="table-container">
+                <table id="history-table">
+                    <thead>
+                        <tr>
+                            <th>ID</th>
+                            <th>Script</th>
+                            <th>Start Time</th>
+                            <th>End Time</th>
+                            <th>Status</th>
+                            <th>Details</th>
+                        </tr>
+                    </thead>
+                    <tbody id="history-data">
+                        <tr>
+                            <td colspan="6" class="empty-table">No job runs found</td>
+                        </tr>
+                    </tbody>
+                </table>
+            </div>
+        </div>
+
+        <div id="output-modal" class="modal">
+            <div class="modal-content">
+                <span class="close">&times;</span>
+                <h2>Script Output</h2>
+                <pre id="job-output"></pre>
+            </div>
+        </div>
+
+        <div id="schedule-modal" class="modal">
+            <div class="modal-content">
+                <span class="close">&times;</span>
+                <h2>Manage Schedule</h2>
+                
+                <div class="schedule-form">
+                    <h3>Add New Schedule</h3>
+                    <form id="add-schedule-form">
+                        <div class="form-group">
+                            <label for="schedule-pattern">Schedule Pattern (cron format):</label>
+                            <input type="text" id="schedule-pattern" placeholder="* * * * *" required>
+                            <small>Format: minute hour day-of-month month day-of-week</small>
+                        </div>
+                        <div class="form-group">
+                            <label for="schedule-description">Description (optional):</label>
+                            <input type="text" id="schedule-description" placeholder="e.g. Every day at 8 AM">
+                        </div>
+                        <button type="submit" class="btn primary">Add Schedule</button>
+                    </form>
+                    
+                    <div class="schedule-help">
+                        <h4>Common Schedule Patterns:</h4>
+                        <ul>
+                            <li><code>0 * * * *</code> - Every hour at minute 0</li>
+                            <li><code>0 8 * * *</code> - Every day at 8:00 AM</li>
+                            <li><code>0 8 * * 1-5</code> - Every weekday at 8:00 AM</li>
+                            <li><code>0 8,17 * * *</code> - Every day at 8:00 AM and 5:00 PM</li>
+                            <li><code>*/15 * * * *</code> - Every 15 minutes</li>
+                        </ul>
+                    </div>
+                </div>
+                
+                <div class="schedule-list">
+                    <h3>Existing Schedules</h3>
+                    <div class="table-container">
+                        <table id="schedules-table">
+                            <thead>
+                                <tr>
+                                    <th>ID</th>
+                                    <th>Schedule</th>
+                                    <th>Description</th>
+                                    <th>Status</th>
+                                    <th>Actions</th>
+                                </tr>
+                            </thead>
+                            <tbody id="schedules-data">
+                                <tr>
+                                    <td colspan="5" class="empty-table">No schedules configured</td>
+                                </tr>
+                            </tbody>
+                        </table>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <script src="script.js"></script>
+</body>
+</html>

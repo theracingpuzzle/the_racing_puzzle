@@ -1,165 +1,38 @@
 <?php
-
-// dashboard/index.php
+// bet-record/index.php
 require_once '../user-management/auth.php'; // Adjust path as needed
 requireLogin();
 
-// Continue with the rest of your dashboard code
-
 // Database connection
-require_once "../includes/db-connection.php"; // This will now use your SQLite connection
+require_once "../includes/db-connection.php";
 
+// Include helper functions
+require_once "includes/functions.php";
 
 // Initialize variables
-$success_message = $error_message = null;
-$stats = ['total' => 0, 'won' => 0, 'lost' => 0, 'pending' => 0, 'total_stake' => 0, 'total_returns' => 0];
+$success_message = $_SESSION['success_message'] ?? null;
+$error_message = $_SESSION['error_message'] ?? null;
 
-function fetchRacecourses() {
-    global $conn;
-    try {
-        $sql = "SELECT * FROM racecourses ORDER BY name ASC";
-        $stmt = $conn->query($sql);
-        $result = $stmt->fetchAll(PDO::FETCH_ASSOC);
+// Clear session messages after using them
+unset($_SESSION['success_message'], $_SESSION['error_message']);
 
-        if (!$result) {
-            error_log("No racecourses found in the table.");
-        }
+// Get the current user ID from session
+$user_id = $_SESSION['user_id'];
 
-        return $result;
-    } catch(PDOException $e) {
-        error_log("Error fetching racecourses: " . $e->getMessage());
+// Fetch user's bet records
+$result = fetchUserBetRecords($conn, $user_id);
 
-        // Check if the table exists
-        $checkTable = $conn->query("SELECT name FROM sqlite_master WHERE type='table' AND name='racecourses'");
-        if (!$checkTable->fetch()) {
-            error_log("Table 'racecourses' does not exist.");
-        }
-
-        // Fall back to distinct values from bet_records
-        try {
-            $sql = "SELECT DISTINCT racecourse FROM bet_records ORDER BY racecourse ASC";
-            $stmt = $conn->query($sql);
-            return $stmt->fetchAll(PDO::FETCH_COLUMN);
-        } catch(PDOException $e) {
-            error_log("Error fetching distinct racecourses: " . $e->getMessage());
-            return [];
-        }
-    }
-}
-
-
-
-// Process form submission
-if ($_SERVER["REQUEST_METHOD"] == "POST" && isset($_POST['submit'])) {
-    try {
-        // Sanitize input data
-        $bet_type = $_POST['bet_type'];
-        $stake = floatval($_POST['stake']);
-        $selection = $_POST['selection'];
-        $odds = $_POST['odds'];
-        $jockey = $_POST['jockey'];
-        $trainer = $_POST['trainer'];
-        $outcome = $_POST['outcome'];
-        
-        // Get the current user ID from session
-        $user_id = $_SESSION['user_id']; // Assuming user_id is stored in session
-        
-        // Handle racecourse (either selected or new)
-        $racecourse = $_POST['racecourse'];
-        
-        // Check if this is a new racecourse to be added to the database
-        if (isset($_POST['new_racecourse']) && $_POST['new_racecourse'] == '1') {
-            // First check if the racecourse already exists to avoid duplicates
-            $checkSql = "SELECT COUNT(*) FROM racecourses WHERE name = :name";
-            $checkStmt = $conn->prepare($checkSql);
-            $checkStmt->bindParam(':name', $racecourse);
-            $checkStmt->execute();
-            
-            if ($checkStmt->fetchColumn() == 0) {
-                // Add new racecourse to the racecourses table
-                $insertCourseSql = "INSERT INTO racecourses (name) VALUES (:name)";
-                $insertCourseStmt = $conn->prepare($insertCourseSql);
-                $insertCourseStmt->bindParam(':name', $racecourse);
-                $insertCourseStmt->execute();
-            }
-        }
-        
-        // Calculate returns if bet won
-        $returns = 0;
-        if ($outcome == 'Won') {
-            if (strpos($odds, '/') !== false) {
-                list($numerator, $denominator) = explode('/', $odds);
-                $returns = $stake + ($stake * $numerator / $denominator);
-            } else {
-                $returns = $stake * floatval($odds);
-            }
-        }
-        
-        // Insert into database using PDO prepared statement with user_id
-        $sql = "INSERT INTO bet_records (bet_type, stake, selection, racecourse, odds, jockey, trainer, outcome, returns, user_id) 
-                VALUES (:bet_type, :stake, :selection, :racecourse, :odds, :jockey, :trainer, :outcome, :returns, :user_id)";
-                
-        $stmt = $conn->prepare($sql);
-        $stmt->bindParam(':bet_type', $bet_type);
-        $stmt->bindParam(':stake', $stake);
-        $stmt->bindParam(':selection', $selection);
-        $stmt->bindParam(':racecourse', $racecourse);
-        $stmt->bindParam(':odds', $odds);
-        $stmt->bindParam(':jockey', $jockey);
-        $stmt->bindParam(':trainer', $trainer);
-        $stmt->bindParam(':outcome', $outcome);
-        $stmt->bindParam(':returns', $returns);
-        $stmt->bindParam(':user_id', $user_id);
-        
-        $stmt->execute();
-        
-        $success_message = "New bet record added successfully!";
-        // Redirect to prevent form resubmission
-        header("Location: index.php#new-record");
-        exit();
-    } catch(PDOException $e) {
-        $error_message = "Error: " . $e->getMessage();
-    }
-}
-
-
-// Fetch existing records
-try {
-    // Get the current user ID from session
-    $user_id = $_SESSION['user_id']; // Assuming user_id is stored in session
-    
-    // SQLite uses different date functions than MySQL
-    // Add WHERE clause to only get current user's records
-    $sql = "SELECT *, datetime(date_added) as formatted_date FROM bet_records 
-            WHERE user_id = :user_id 
-            ORDER BY date_added DESC";
-    $stmt = $conn->prepare($sql);
-    $stmt->bindParam(':user_id', $user_id);
-    $stmt->execute();
-    $result = $stmt->fetchAll(PDO::FETCH_ASSOC);
-    
-    // Calculate stats
-    if ($result) {
-        $stats['total'] = count($result);
-        
-        foreach ($result as $row) {
-            if ($row['outcome'] == 'Won') {
-                $stats['won']++;
-                $stats['total_returns'] += floatval($row['returns']);
-            } elseif ($row['outcome'] == 'Lost') {
-                $stats['lost']++;
-            } elseif ($row['outcome'] == 'Pending') {
-                $stats['pending']++;
-            }
-            $stats['total_stake'] += floatval($row['stake']);
-        }
-    }
-} catch(PDOException $e) {
-    $error_message = "Error fetching records: " . $e->getMessage();
-}
+// Calculate stats
+$stats = calculateStats($result);
 
 // Get racecourses
-$racecourses = fetchRacecourses();
+$racecourses = fetchRacecourses($conn);
+
+// Debugging
+if ($_SERVER["REQUEST_METHOD"] == "POST") {
+    error_log("POST request received in index.php");
+    error_log("POST data: " . print_r($_POST, true));
+}
 ?>
 
 <!DOCTYPE html>
@@ -173,263 +46,18 @@ $racecourses = fetchRacecourses();
     <!-- Main CSS File -->
     <link rel="stylesheet" href="../assets/css/main.css">
     <!-- Additional CSS for bet records page -->
-    <!-- <link rel="stylesheet" href="assets/css/bet-record.css"> -->
+    <link rel="stylesheet" href="assets/css/bet-record.css">
+
+    <link rel="stylesheet" href="../test/betting-modal.css">
+    
+    <!-- Enhanced Table Styling -->
+    <link rel="stylesheet" href="assets/css/enhanced-table.css">
    
 </head>
 
 <style>
-        /* Improved Table Styles */
-        .table {
-            width: 100%;
-            border-collapse: collapse;
-            margin-bottom: 1rem;
-            border-radius: var(--radius-sm);
-            overflow: hidden;
-        }
-        
-        .table th, .table td {
-            padding: 12px 15px;
-            text-align: left;
-            border-bottom: 1px solid var(--border-color);
-        }
-        
-        .table th {
-            background-color: var(--medium-bg);
-            font-weight: 600;
-            color: var(--text-dark);
-            position: sticky;
-            top: 0;
-            z-index: 10;
-            box-shadow: 0 1px 0 var(--border-color);
-        }
-        
-        .table-striped tbody tr:nth-of-type(odd) {
-            background-color: rgba(0, 0, 0, 0.02);
-        }
-        
-        .table-hover tbody tr:hover {
-            background-color: rgba(30, 86, 49, 0.07);
-        }
-        
-        /* Responsive table */
-        @media (max-width: 992px) {
-            .table-responsive {
-                display: block;
-                width: 100%;
-                overflow-x: auto;
-                -webkit-overflow-scrolling: touch;
-            }
-        }
-        
-        /* Status Badge Positioning */
-        td .badge {
-            padding: 5px 10px;
-            display: inline-block;
-            text-align: center;
-            min-width: 70px;
-        }
-        
-        /* Better Modal Scrolling */
-        .modal-dialog {
-            max-height: 90vh;
-            display: flex;
-            flex-direction: column;
-        }
-        
-        .modal-content {
-            max-height: 90vh;
-            display: flex;
-            flex-direction: column;
-        }
-        
-        .modal-body {
-            overflow-y: auto;
-            padding: 1.5rem;
-        }
-        
-        /* Stats cards styling */
-        .stats-card {
-            padding: 1.2rem;
-            border-radius: var(--radius-md);
-            min-width: 120px;
-            background-color: white;
-            box-shadow: var(--shadow-sm);
-            text-align: center;
-            flex: 1 1 0;
-            position: relative;
-            overflow: hidden;
-            border: 1px solid var(--border-color);
-        }
-        
-        .stats-card.total {
-         background: linear-gradient(135deg, #007bff, #0056b3); /* Blue gradient */
-        color: white;
-        }
 
-        .stats-card.wins {
-    background: linear-gradient(135deg, #28a745, #218838); /* Green gradient */
-    color: white;
-        }
-
-        .stats-card.losses {
-    background: linear-gradient(135deg, #dc3545, #a71d2a); /* Red gradient */
-    color: white;
-}
-
-        .stats-card.pending {
-          background: linear-gradient(135deg, #ffc107, #ff9800); /* Amber gradient */
-           color: #333;
-}
-
-
-        .stats-value {
-            font-size: 2.2rem;
-            font-weight: 700;
-            margin-bottom: 5px;
-        }
-        
-        .stats-label {
-            font-size: 1rem;
-            text-transform: uppercase;
-            letter-spacing: 1px;
-            font-weight: 600;
-        }
-        
-        /* Action button styling */
-        .btn-sm {
-            padding: 0.25rem 0.5rem;
-            font-size: 0.875rem;
-        }
-        
-        .text-success {
-            color: #1e5631;
-        }
-        
-        .text-danger {
-            color: #e63946;
-        }
-        
-        /* Financial info in stats */
-        .financial-summary {
-            border-left: 4px solid var(--primary-color);
-            padding-left: 15px;
-        }
-        
-        /* Progress bar */
-        .progress {
-            height: 12px;
-            background-color: #e9ecef;
-            border-radius: 10px;
-            overflow: hidden;
-        }
-        
-        .progress-bar {
-            height: 100%;
-            color: white;
-            text-align: center;
-            background-color: var(--primary-color);
-            transition: width 0.3s ease;
-        }
-        
-        .bg-success {
-            background-color: var(--primary-color) !important;
-        }
-        
-        /* Search and filter styling */
-        .search-container {
-            flex: 1;
-            max-width: 400px;
-        }
-        
-        .input-group {
-            display: flex;
-            position: relative;
-        }
-        
-        .input-group-text {
-            display: flex;
-            align-items: center;
-            padding: 0.375rem 0.75rem;
-            background-color: var(--medium-bg);
-            border: 1px solid var(--border-color);
-            border-right: none;
-            border-top-left-radius: var(--radius-sm);
-            border-bottom-left-radius: var(--radius-sm);
-        }
-        
-        .form-control {
-            flex: 1;
-            border-top-left-radius: 0;
-            border-bottom-left-radius: 0;
-        }
-        
-        /* Filter buttons */
-        .btn-group {
-            display: flex;
-        }
-        
-        .btn-outline-secondary,
-        .btn-outline-success,
-        .btn-outline-danger,
-        .btn-outline-warning {
-            background-color: transparent;
-            padding: 0.375rem 0.75rem;
-        }
-        
-        .btn-outline-secondary {
-            border: 1px solid #6c757d;
-            color: #6c757d;
-        }
-        
-        .btn-outline-success {
-            border: 1px solid #1e5631;
-            color: #1e5631;
-        }
-        
-        .btn-outline-danger {
-            border: 1px solid #e63946;
-            color: #e63946;
-        }
-        
-        .btn-outline-warning {
-            border: 1px solid #f3a712;
-            color: #f3a712;
-        }
-        
-        .btn-outline-secondary:hover, .btn-outline-secondary.active {
-            background-color: #6c757d;
-            color: white;
-        }
-        
-        .btn-outline-success:hover, .btn-outline-success.active {
-            background-color: #1e5631;
-            color: white;
-        }
-        
-        .btn-outline-danger:hover, .btn-outline-danger.active {
-            background-color: #e63946;
-            color: white;
-        }
-        
-        .btn-outline-warning:hover, .btn-outline-warning.active {
-            background-color: #f3a712;
-            color: white;
-        }
-        
-        /* Fix modal footer position */
-        .modal-footer {
-            border-top: 1px solid var(--border-color);
-            padding: 1rem;
-            background-color: var(--medium-bg);
-            display: flex;
-            justify-content: flex-end;
-            gap: 10px;
-        }
-        
-        .d-none {
-            display: none !important;
-        }
-    </style>
+</style>
 
 <?php include '../test/app-header.php'; ?>
 
@@ -444,9 +72,12 @@ $racecourses = fetchRacecourses();
         <div class="card mb-20">
             <div class="card-header">
                 <div class="d-flex gap-10">
-                    <button type="button" class="btn btn-primary" data-bs-toggle="modal" data-bs-target="#addBetModal">
+                    <!-- <button type="button" class="btn btn-primary" data-bs-toggle="modal" data-bs-target="#addBetModal">
                         <i class="fas fa-plus"></i> Add New Bet
-                    </button>
+                    </button> -->
+                    <button id="openModalBtn" class="test-button">
+            <i class="fas fa-plus-circle"></i> Add New Bet
+        </button>
                     <button type="button" class="btn btn-secondary" onclick="toggleStats()">
                         <i class="fas fa-chart-line"></i> Toggle Stats
                     </button>
@@ -462,6 +93,8 @@ $racecourses = fetchRacecourses();
             <?php if(isset($error_message)): ?>
                 <div class="alert alert-danger"><?php echo $error_message; ?></div>
             <?php endif; ?>
+
+
             
             <!-- Stats Section with race-themed styling -->
             <div id="statsContainer" class="card-body">
@@ -531,11 +164,11 @@ $racecourses = fetchRacecourses();
             </div>
         </div>
         
-        <!-- Records Table Card -->
-        <div class="card">
-            <div class="card-body">
-                <div class="table-responsive">
-                    <table class="table table-striped table-hover">
+ <!-- Records Table Card -->
+   <!-- Desktop Table View (hides on small screens) -->
+   <div class="table-responsive-large">
+    <div class="table-responsive">
+        <table class="table modern-table">
                         <thead>
                             <tr>
                                 <th>Date</th>
@@ -553,41 +186,56 @@ $racecourses = fetchRacecourses();
                         <tbody>
                             <?php if (!empty($result)): ?>
                                 <?php foreach($result as $row): ?>
-                                <tr id="bet-row-<?php echo $row['id']; ?>">
-                                    <td><?php 
-                                        // Format date for SQLite timestamp
-                                        $date = new DateTime($row['formatted_date']);
-                                        echo $date->format('d/m/Y H:i');
-                                    ?></td>
-                                    <td><?php echo htmlspecialchars($row['bet_type']); ?></td>
-                                    <td>£<?php echo htmlspecialchars($row['stake']); ?></td>
-                                    <td><?php echo htmlspecialchars($row['selection']); ?></td>
-                                    <td><?php echo htmlspecialchars($row['racecourse']); ?></td>
-                                    <td><?php echo htmlspecialchars($row['odds']); ?></td>
-                                    <td><?php echo htmlspecialchars($row['jockey']); ?></td>
-                                    <td><?php echo htmlspecialchars($row['trainer']); ?></td>
-                                    <td>
-                                        <?php if($row['outcome'] == 'Won'): ?>
-                                            <span class="badge badge-success">Won</span>
-                                        <?php elseif($row['outcome'] == 'Lost'): ?>
-                                            <span class="badge badge-danger">Lost</span>
-                                        <?php elseif($row['outcome'] == 'Pending'): ?>
-                                            <span class="badge badge-warning">Pending</span>
-                                        <?php else: ?>
-                                            <span class="badge badge-info"><?php echo htmlspecialchars($row['outcome']); ?></span>
-                                        <?php endif; ?>
-                                    </td>
-                                    <td>
-                                        <button class="btn btn-sm btn-info" onclick="toggleEditMode(<?php echo $row['id']; ?>)" 
-                                                data-bs-toggle="tooltip" title="Edit">
-                                            <i class="fas fa-edit"></i>
-                                        </button>
-                                        <a href="delete_bet.php?id=<?php echo $row['id']; ?>" class="btn btn-sm btn-danger delete-bet" 
-                                        data-bs-toggle="tooltip" title="Delete">
-                                            <i class="fas fa-trash"></i>
-                                        </a>
-                                    </td>
-                                </tr>
+                                    <tr id="bet-row-<?php echo $row['id']; ?>">
+    <td data-label="Date" class="col-date">
+        <?php 
+            // Format date for SQLite timestamp
+            $date = new DateTime($row['formatted_date']);
+            echo $date->format('d/m/Y');
+            // Add tooltip with time
+            echo '<small class="d-block text-muted">' . $date->format('H:i') . '</small>';
+        ?>
+    </td>
+    <td data-label="Bet Type"><?php echo htmlspecialchars($row['bet_type']); ?></td>
+    <td data-label="Stake" class="col-stake">£<?php echo htmlspecialchars($row['stake']); ?></td>
+    <td data-label="Selection"><?php echo htmlspecialchars($row['selection']); ?></td>
+    <td data-label="Racecourse">
+        <span class="racecourse-badge">
+            <?php echo htmlspecialchars($row['racecourse']); ?>
+        </span>
+    </td>
+    <td data-label="Odds" class="col-odds"><?php echo htmlspecialchars($row['odds']); ?></td>
+    <td data-label="Jockey"><?php echo htmlspecialchars($row['jockey']); ?></td>
+    <td data-label="Trainer"><?php echo htmlspecialchars($row['trainer']); ?></td>
+    <td data-label="Outcome" class="col-outcome">
+        <?php if($row['outcome'] == 'Won'): ?>
+            <span class="modern-badge badge-won">Won</span>
+        <?php elseif($row['outcome'] == 'Lost'): ?>
+            <span class="modern-badge badge-lost">Lost</span>
+        <?php elseif($row['outcome'] == 'Pending'): ?>
+            <span class="modern-badge badge-pending">Pending</span>
+            <!-- Quick update buttons for pending bets only -->
+            <div class="quick-update">
+                <button class="quick-update-btn quick-won" data-bet-id="<?php echo $row['id']; ?>" data-outcome="Won">Won</button>
+                <button class="quick-update-btn quick-lost" data-bet-id="<?php echo $row['id']; ?>" data-outcome="Lost">Lost</button>
+            </div>
+        <?php else: ?>
+            <span class="modern-badge badge-void"><?php echo htmlspecialchars($row['outcome']); ?></span>
+        <?php endif; ?>
+    </td>
+    <td data-label="Actions" class="col-actions">
+        <div class="action-buttons">
+            <button class="action-btn edit-btn" onclick="toggleEditMode(<?php echo $row['id']; ?>)" 
+                    data-bet-id="<?php echo $row['id']; ?>" data-bs-toggle="tooltip" title="Edit">
+                <i class="fas fa-edit"></i>
+            </button>
+            <a href="delete_bet.php?id=<?php echo $row['id']; ?>" class="action-btn delete-btn delete-bet" 
+            data-bs-toggle="tooltip" title="Delete">
+                <i class="fas fa-trash"></i>
+            </a>
+        </div>
+    </td>
+</tr>
                                 <?php endforeach; ?>
                             <?php else: ?>
                                 <tr>
@@ -602,171 +250,243 @@ $racecourses = fetchRacecourses();
         </div>
     </div>
 
-   <!-- Add Bet Modal with racing-themed styling -->
-<div class="modal fade" id="addBetModal" tabindex="-1">
-    <div class="modal-dialog modal-dialog-scrollable">
-        <div class="modal-content">
-            <div class="modal-header">
-                <h3 class="modal-title" id="addBetModalLabel">Add New Bet</h3>
-                <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+   
+
+     <!-- Betting Modal HTML Structure -->
+     <div id="bettingModal" class="betting-modal">
+        <div class="betting-modal-content">
+            <div class="betting-modal-header">
+                <h2><i class="fas fa-ticket-alt"></i> Betting Information</h2>
+                <span class="betting-modal-close"><i class="fas fa-times"></i></span>
             </div>
-            <div class="modal-body">
-                <form method="post" action="" id="betForm" class="needs-validation" novalidate>
-                    <div class="row mb-3">
-                        <div class="col-md-6">
-                            <label for="bet_type" class="form-label">Bet Type</label>
-                            <select class="form-select" id="bet_type" name="bet_type" required>
-                                <option value="">Select Bet Type</option>
+            <div class="betting-modal-body">
+            <form id="bettingForm" method="post" action="includes/process_bet.php">
+                    <div class="form-row">
+                        <div class="form-group">
+                            <label for="bet_type" class="required-field">Bet Type</label>
+                            <select id="bet_type" name="bet_type" required>
                                 <option value="Win">Win</option>
                                 <option value="Place">Place</option>
                                 <option value="Each Way">Each Way</option>
-                                <option value="Forecast">Forecast</option>
-                                <option value="Tricast">Tricast</option>
                                 <option value="Accumulator">Accumulator</option>
+                                <option value="Cover/Insure">Insure</option>
                             </select>
-                            <div class="invalid-feedback">Please select a bet type</div>
+                            <div class="tooltip">
+                                <i class="fas fa-info-circle"></i>
+                                <span class="tooltip-text">Select the type of bet you're placing</span>
+                            </div>
                         </div>
-                        <div class="col-md-6">
-                            <label for="stake" class="form-label">Stake (£)</label>
-                            <input type="number" step="0.01" class="form-control" id="stake" name="stake" required>
-                            <div class="invalid-feedback">Please enter stake amount</div>
-                        </div>
-                    </div>
-                    <div class="row mb-3">
-                        <div class="col-md-6">
-                            <label for="selection" class="form-label">Selection/Horse</label>
-                            <input type="text" class="form-control" id="selection" name="selection" required>
-                            <div class="invalid-feedback">Please enter horse name</div>
-                        </div>
-                        <div class="col-md-6">
-                            <label for="racecourse" class="form-label">Racecourse</label>
-                            <input type="text" class="form-control" id="racecourse" name="racecourse" list="racecourseList" autocomplete="off" required>
-                            <datalist id="racecourseList">
-                                <?php 
-                                // Check if we got array of arrays (from racecourses table) or just values
-                                if(!empty($racecourses) && isset($racecourses[0]) && is_array($racecourses[0])) {
-                                    foreach($racecourses as $course): ?>
-                                        <option value="<?php echo htmlspecialchars($course['name']); ?>">
-                                    <?php endforeach;
-                                } else {
-                                    // Simple array of values
-                                    foreach($racecourses as $course): ?>
-                                        <option value="<?php echo htmlspecialchars($course); ?>">
-                                    <?php endforeach;
-                                } ?>
-                            </datalist>
-                            <div class="invalid-feedback">Please enter a racecourse</div>
-                            
-                            <!-- Hidden field to track if this is a new racecourse -->
-                            <input type="hidden" name="new_racecourse" id="new_racecourse" value="0">
+                        
+                        <div class="form-group" id="selectionsCountGroup" style="display: none;">
+                            <label for="numberOfSelections" class="required-field">Number of Selections</label>
+                            <select id="numberOfSelections">
+                                <option value="2">2</option>
+                                <option value="3">3</option>
+                                <option value="4">4</option>
+                                <option value="5">5</option>
+                                <option value="6">6</option>
+                            </select>
                         </div>
                     </div>
-                    <div class="row mb-3">
-                        <div class="col-md-4">
-                            <label for="odds" class="form-label">Odds</label>
-                            <input type="text" class="form-control" id="odds" name="odds" placeholder="e.g. 5/1" required>
-                            <div class="invalid-feedback">Please enter odds (e.g. 5/1)</div>
-                        </div>
-                        <div class="col-md-4">
-                            <label for="jockey" class="form-label">Jockey</label>
-                            <input type="text" class="form-control" id="jockey" name="jockey" required>
-                            <div class="invalid-feedback">Please enter Jockey name</div>
-                        </div>
-                        <div class="col-md-4">
-                            <label for="trainer" class="form-label">Trainer</label>
-                            <input type="text" class="form-control" id="trainer" name="trainer" required>
-                            <div class="invalid-feedback">Please enter Trainer name</div>
+
+                    <!-- Selection container - this will hold all selections -->
+                    <div id="selectionsContainer">
+                        <div class="selection-box" data-index="0">
+                            <h3 class="selection-title">Selection Details</h3>
+                            <div class="form-row">
+                                <div class="form-group">
+                                    <label for="selection_0" class="required-field">Horse Name</label>
+                                    <input type="text" id="selection_0" name="selection" required placeholder="Enter horse name">
+                                </div>
+                                <div class="form-group">
+                                    <label for="racecourse_0" class="required-field">Racecourse</label>
+                                    <input type="text" id="racecourse_0" name="racecourse" required 
+                                              placeholder="Enter racecourse" list="racecourseList">
+                                </div>
+                            </div>
+                            <div class="form-row">
+                                <div class="form-group">
+                                    <label for="jockey_0">Jockey</label>
+                                    <input type="text" id="jockey_0" name="jockey" placeholder="Enter jockey name">
+                                </div>
+                                <div class="form-group">
+                                    <label for="trainer_0">Trainer</label>
+                                    <input type="text" id="trainer_0" name="trainer" placeholder="Enter trainer name">
+                                </div>
+                            </div>
+                            <div class="form-row">
+                                <div class="form-group">
+                                    <label for="odds_0" class="required-field">Odds</label>
+                                    <div class="input-with-icon">
+                                        <i class="fas fa-percentage input-icon"></i>
+                                        <input type="text" id="odds_0" name="odds" placeholder="e.g. 5/1 or 6.0" required>
+                                    </div>
+                                    <div class="tooltip">
+                                        <i class="fas fa-info-circle"></i>
+                                        <span class="tooltip-text">Enter odds in fractional (e.g. 5/1) or decimal (e.g. 6.0) format</span>
+                                    </div>
+                                </div>
+                            </div>
                         </div>
                     </div>
-                    <div class="row mb-3">
-                        <div class="col-md-6">
-                            <label for="outcome" class="form-label">Outcome</label>
-                            <select class="form-select" id="outcome" name="outcome" required>
-                                <option value="">Select Outcome</option>
+
+                    <!-- Add this to your form before the closing </form> tag -->
+                        <datalist id="racecourseList">
+                         <?php foreach($racecourses as $racecourse): ?>
+                            <?php $raceName = is_array($racecourse) ? $racecourse['name'] : $racecourse; ?>
+                            <option value="<?php echo htmlspecialchars($raceName); ?>">
+                          <?php endforeach; ?>
+                        </datalist>
+
+                    <div class="form-row">
+                        <div class="form-group">
+                            <label for="stake" class="required-field">Stake (£)</label>
+                            <div class="input-with-icon">
+                                <i class="fas fa-pound-sign input-icon"></i>
+                                <input type="number" id="stake" name="stake" step="0.01" min="0.01" required placeholder="Enter stake amount">
+                            </div>
+                        </div>
+                        <div class="form-group">
+                            <label for="outcome">Outcome</label>
+                            <select id="outcome" name="outcome">
+                                <option value="Pending">Pending</option>
                                 <option value="Won">Won</option>
                                 <option value="Lost">Lost</option>
-                                <option value="Pending">Pending</option>
                                 <option value="Void">Void</option>
                             </select>
-                            <div class="invalid-feedback">Please select an outcome</div>
-                        </div>
-                        <div class="col-md-6">
-                            <label class="form-label">Potential Returns</label>
-                            <div class="input-group">
-                                <span class="input-group-text">£</span>
-                                <div class="form-control bg-light" id="potentialReturns">0.00</div>
+                            <div class="outcome-badges" style="margin-top: 8px;">
+                                <span class="badge badge-pending">Pending</span>
+                                <span class="badge badge-won">Won</span>
+                                <span class="badge badge-lost">Lost</span>
+                                <span class="badge badge-void">Void</span>
                             </div>
-                            <small class="text-muted">Based on stake and odds</small>
                         </div>
                     </div>
-                    <div class="modal-footer">
-                        <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Close</button>
-                        <button type="submit" name="submit" class="btn btn-primary">Save Bet</button>
+
+                    <!-- Potential Returns Box -->
+                    <div class="returns-box">
+                        <div class="returns-row">
+                            <div class="returns-item">
+                                <p class="returns-label">Potential Return:</p>
+                                <p class="returns-value" id="potentialReturns">£0.00</p>
+                            </div>
+                            <div class="returns-item">
+                                <p class="returns-label">Potential Profit:</p>
+                                <p class="returns-value" id="potentialProfit">£0.00</p>
+                            </div>
+                        </div>
+                    </div>
+                    
+                    <div class="form-actions">
+                        <button type="button" id="cancelButton" class="btn btn-cancel">
+                            <i class="fas fa-times"></i> Cancel
+                        </button>
+                        <button type="submit" name="submitBtn" class="btn btn-submit">
+                            <i class="fas fa-check"></i> Submit Bet
+                        </button>
                     </div>
                 </form>
             </div>
         </div>
     </div>
+
+    <!-- Mobile Card View (automatically shows on small screens) -->
+<div class="table-responsive-mobile">
+    <?php if (!empty($result)): ?>
+        <?php foreach($result as $row): ?>
+            <div class="bet-card" data-bet-id="<?php echo $row['id']; ?>" data-outcome="<?php echo strtolower($row['outcome']); ?>">
+    <div class="bet-card-header">
+        <span class="bet-date"><?php 
+            $date = new DateTime($row['formatted_date']);
+            echo $date->format('d/m/Y');
+        ?></span>
+        
+        <?php if($row['outcome'] == 'Won'): ?>
+            <span class="badge badge-success">Won</span>
+        <?php elseif($row['outcome'] == 'Lost'): ?>
+            <span class="badge badge-danger">Lost</span>
+        <?php elseif($row['outcome'] == 'Pending'): ?>
+            <span class="badge badge-warning">Pending</span>
+        <?php else: ?>
+            <span class="badge badge-info"><?php echo htmlspecialchars($row['outcome']); ?></span>
+        <?php endif; ?>
+    </div>
+    <div class="bet-card-body">
+        <div class="bet-info-group">
+            <div class="bet-label">Horse:</div>
+            <div class="bet-value"><?php echo htmlspecialchars($row['selection']); ?></div>
+        </div>
+        <div class="bet-info-group">
+            <div class="bet-label">Racecourse:</div>
+            <div class="bet-value"><?php echo htmlspecialchars($row['racecourse']); ?></div>
+        </div>
+        <div class="bet-info-row">
+            <div class="bet-info-group">
+                <div class="bet-label">Stake:</div>
+                <div class="bet-value">£<?php echo htmlspecialchars($row['stake']); ?></div>
+            </div>
+            <div class="bet-info-group">
+                <div class="bet-label">Odds:</div>
+                <div class="bet-value"><?php echo htmlspecialchars($row['odds']); ?></div>
+            </div>
+        </div>
+        <div class="bet-info-row">
+            <div class="bet-info-group">
+                <div class="bet-label">Type:</div>
+                <div class="bet-value"><?php echo htmlspecialchars($row['bet_type']); ?></div>
+            </div>
+            <?php if (!empty($row['jockey'])): ?>
+            <div class="bet-info-group">
+                <div class="bet-label">Jockey:</div>
+                <div class="bet-value"><?php echo htmlspecialchars($row['jockey']); ?></div>
+            </div>
+            <?php endif; ?>
+        </div>
+        
+        <?php if($row['outcome'] == 'Pending'): ?>
+        <!-- Quick update buttons for pending bets only -->
+        <div class="quick-update">
+            <button class="quick-update-btn quick-won" data-bet-id="<?php echo $row['id']; ?>" data-outcome="Won">Mark as Won</button>
+            <button class="quick-update-btn quick-lost" data-bet-id="<?php echo $row['id']; ?>" data-outcome="Lost">Mark as Lost</button>
+        </div>
+        <?php endif; ?>
+        
+        <div class="bet-card-footer">
+            <button class="btn btn-sm btn-info" 
+                  onclick="toggleEditMode(<?php echo $row['id']; ?>)"
+                  data-bet-id="<?php echo $row['id']; ?>">
+                <i class="fas fa-edit"></i> Edit
+            </button>
+            <a href="delete_bet.php?id=<?php echo $row['id']; ?>" class="btn btn-sm btn-danger delete-bet">
+                <i class="fas fa-trash"></i> Delete
+            </a>
+        </div>
+    </div>
 </div>
+        <?php endforeach; ?>
+    <?php else: ?>
+        <div class="alert alert-info">No bet records found</div>
+    <?php endif; ?>
+</div>
+
+ 
 
     <?php include '../test/bottom-nav.php'; ?>
 
 
     <script src="https://cdnjs.cloudflare.com/ajax/libs/bootstrap/5.3.0/js/bootstrap.bundle.min.js"></script>
-    <script src="assets/js/bet-record.js"></script>
+    
+<script src="assets/js/modal.js"></script>
+<script src="assets/js/calculations.js"></script>
+<script src="assets/js/form-handler.js"></script>
+<script src="assets/js/filters.js"></script>
+
+<!-- Enhanced Edit, Delete, and UI functionality -->
+<script src="assets/js/edit-bet.js"></script>
+<script src="assets/js/quick-update.js"></script>
+<script src="assets/js/delete-confirm.js"></script>
     
     <script>
-    // Script to handle new racecourse entry
-    document.addEventListener('DOMContentLoaded', function() {
-        const racecourseSelect = document.getElementById('racecourse');
-        const newRacecourseContainer = document.getElementById('newRacecourseContainer');
-        const newRacecourseInput = document.getElementById('newRacecourse');
-        const newRacecourseFlag = document.getElementById('new_racecourse');
-        const closeButtons = document.querySelectorAll('.close-modal');
-        
-        racecourseSelect.addEventListener('change', function() {
-            if (this.value === 'other') {
-                newRacecourseContainer.classList.remove('d-none');
-                newRacecourseFlag.value = '1';
-                newRacecourseInput.required = true;
-                
-                // When "Other" is selected, we'll use the value from the new input field
-                newRacecourseInput.addEventListener('input', function() {
-                    racecourseSelect.value = newRacecourseInput.value;
-                });
-            } else {
-                newRacecourseContainer.classList.add('d-none');
-                newRacecourseFlag.value = '0';
-                newRacecourseInput.required = false;
-            }
-        });
-        
-        // Calculate potential returns when stake or odds change
-        const stakeInput = document.getElementById('stake');
-        const oddsInput = document.getElementById('odds');
-        const potentialReturnsDisplay = document.getElementById('potentialReturns');
-        const outcomeSelect = document.getElementById('outcome');
-        
-        function calculateReturns() {
-            const stake = parseFloat(stakeInput.value) || 0;
-            const odds = oddsInput.value;
-            let returns = 0;
-            
-            if (odds && stake > 0) {
-                if (odds.includes('/')) {
-                    const [numerator, denominator] = odds.split('/');
-                    returns = stake + (stake * parseFloat(numerator) / parseFloat(denominator));
-                } else {
-                    returns = stake * parseFloat(odds);
-                }
-            }
-            
-            potentialReturnsDisplay.textContent = returns.toFixed(2);
-        }
-        
-        stakeInput.addEventListener('input', calculateReturns);
-        oddsInput.addEventListener('input', calculateReturns);
-    });
     
     // Toggle stats section visibility
     function toggleStats() {

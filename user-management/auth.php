@@ -2,7 +2,7 @@
 // auth.php - Authentication system for racing website
 
 // Include your existing database connection
-require_once '../includes/db-connection.php';
+require_once(__DIR__ . '/../includes/db-connection.php');
 
 // Setup the users tables if they don't exist
 function setupUserTables() {

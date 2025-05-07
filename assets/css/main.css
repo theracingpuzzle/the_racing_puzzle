@@ -363,7 +363,7 @@ input:focus, select:focus, textarea:focus {
     margin-bottom: 5px;
 }
 
-/* Modal Styles */
+Modal Styles
 .modal {
     display: none;
     position: fixed;
@@ -464,3 +464,4 @@ input:focus, select:focus, textarea:focus {
         font-size: 1.25rem;
     }
 }
+

@@ -56,7 +56,8 @@ function getAllHorses($user_id, $sort = 'name') {
                 'last_run_notes' => $horse['notes'] ?? '', // Assuming notes maps to last_run_notes
                 'notify' => $horse['notify'] ?? '1',
                 'date_added' => $horse['date_added'] ?? '',
-                'user_id' => $horse['user_id']
+                'user_id' => $horse['user_id'],
+                'silk_url' => $horse['silk_url'] ?? '' // Add the silk_url field here
             ];
         }, $horses);
     } catch (PDOException $e) {
@@ -93,7 +94,8 @@ function searchHorses($user_id, $search) {
                 'last_run_notes' => $horse['notes'] ?? '', // Assuming notes maps to last_run_notes
                 'notify' => $horse['notify'] ?? '1',
                 'date_added' => $horse['date_added'] ?? '',
-                'user_id' => $horse['user_id']
+                'user_id' => $horse['user_id'],
+                'silk_url' => $horse['silk_url'] ?? '' // Add the silk_url field here
             ];
         }, $horses);
     } catch (PDOException $e) {
@@ -132,7 +134,8 @@ function getHorseById($user_id, $horse_id) {
             'last_run_notes' => $horse['notes'] ?? '',
             'notify' => $horse['notify'] ?? '1',
             'date_added' => $horse['date_added'] ?? '',
-            'user_id' => $horse['user_id']
+            'user_id' => $horse['user_id'],
+            'silk_url' => $horse['silk_url'] ?? '' // Add the silk_url field here
         ];
     } catch (PDOException $e) {
         error_log("Error getting horse by ID: " . $e->getMessage());
