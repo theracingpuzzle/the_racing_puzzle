@@ -1,6 +1,6 @@
 <?php
 // Full path to your JSON file
-$jsonFilePath = '../racecards/assets/js/2025-05-07.json';
+$jsonFilePath = '../race-cards/runners/2025-05-10.json';
 
 // Check if file exists
 if (file_exists($jsonFilePath)) {

@@ -1,34 +1,76 @@
-// Fixed race-card.js with proper display handling
+// Replace your existing toggle button event handler with this one
 document.addEventListener('DOMContentLoaded', function() {
-    console.log('DOM fully loaded - initializing race card functionality');
-    
     // Toggle between card and table view for each race
     const toggleButtons = document.querySelectorAll('.toggle-button');
     console.log(`Found ${toggleButtons.length} toggle buttons`);
     
     toggleButtons.forEach(button => {
         button.addEventListener('click', function() {
+            // Find the parent race card
             const parentRaceCard = this.closest('.race-card');
+            if (!parentRaceCard) {
+                console.error('Could not find parent race card');
+                return;
+            }
+            
+            // Determine if this is the card view button
             const isCardView = this.querySelector('i').classList.contains('fa-th');
+            console.log(`Toggle button clicked. Is Card View: ${isCardView}`);
             
             // Toggle active class on buttons
             const siblingButtons = this.parentElement.querySelectorAll('.toggle-button');
             siblingButtons.forEach(btn => btn.classList.remove('active'));
             this.classList.add('active');
             
-            // Show/hide corresponding view
+            // Get the grid and table containers
             const runnersGrid = parentRaceCard.querySelector('.runners-grid');
             const runnersTable = parentRaceCard.querySelector('.runners-table');
             
-            if (isCardView) {
-                runnersGrid.style.display = 'grid';
-                runnersTable.style.display = 'none';
-            } else {
-                runnersGrid.style.display = 'none';
-                runnersTable.style.display = 'block';
+            if (!runnersGrid || !runnersTable) {
+                console.error('Could not find runners grid or table');
+                return;
             }
+            
+            console.log('Before toggle - Grid display:', runnersGrid.style.display);
+            console.log('Before toggle - Table display:', runnersTable.style.display);
+            
+            // Use a more aggressive approach with !important
+            if (isCardView) {
+                // Card View - Show grid, hide table
+                runnersGrid.style.setProperty('display', 'grid', 'important');
+                runnersTable.style.setProperty('display', 'none', 'important');
+                
+                // Also try with classList just to be safe
+                runnersGrid.classList.remove('hidden-view');
+                runnersTable.classList.add('hidden-view');
+            } else {
+                // Table View - Show table, hide grid
+                runnersGrid.style.setProperty('display', 'none', 'important');
+                runnersTable.style.setProperty('display', 'block', 'important');
+                
+                // Also try with classList just to be safe
+                runnersGrid.classList.add('hidden-view');
+                runnersTable.classList.remove('hidden-view');
+            }
+            
+            console.log('After toggle - Grid display:', runnersGrid.style.display);
+            console.log('After toggle - Table display:', runnersTable.style.display);
+            
+            // Force a reflow (can help with stubborn display issues)
+            void parentRaceCard.offsetWidth;
         });
     });
+    
+    // Add a CSS class for hiding elements
+    const style = document.createElement('style');
+    style.textContent = `
+        .hidden-view {
+            display: none !important;
+            visibility: hidden !important;
+        }
+    `;
+    document.head.appendChild(style);
+
 
     // COURSE TOGGLE FUNCTIONALITY
     // Course container toggle (expand/collapse)

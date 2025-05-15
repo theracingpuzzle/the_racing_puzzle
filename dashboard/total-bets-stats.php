@@ -23,16 +23,16 @@ try {
     $totalBets = $result['total_bets'];
     
     // Get previous month bets to calculate percentage change
-    $stmt = $conn->prepare("
-        SELECT 
-            (SELECT COUNT(*) FROM bet_records 
-             WHERE user_id = :user_id 
-             AND DATE(bet_date) >= DATE_SUB(CURDATE(), INTERVAL 1 MONTH)) AS current_month,
-            (SELECT COUNT(*) FROM bet_records 
-             WHERE user_id = :user_id 
-             AND DATE(bet_date) >= DATE_SUB(CURDATE(), INTERVAL 2 MONTH)
-             AND DATE(bet_date) < DATE_SUB(CURDATE(), INTERVAL 1 MONTH)) AS previous_month
-    ");
+    // $stmt = $conn->prepare("
+    //     SELECT 
+    //         (SELECT COUNT(*) FROM bet_records 
+    //          WHERE user_id = :user_id 
+    //          AND DATE(bet_date) >= DATE_SUB(CURDATE(), INTERVAL 1 MONTH)) AS current_month,
+    //         (SELECT COUNT(*) FROM bet_records 
+    //          WHERE user_id = :user_id 
+    //          AND DATE(bet_date) >= DATE_SUB(CURDATE(), INTERVAL 2 MONTH)
+    //          AND DATE(bet_date) < DATE_SUB(CURDATE(), INTERVAL 1 MONTH)) AS previous_month
+    // ");
     
     $stmt->bindParam(':user_id', $user_id);
     $stmt->execute();

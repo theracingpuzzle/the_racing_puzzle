@@ -282,3 +282,63 @@
     max-height: 100%;
     display: block;
 }
+
+/* Essential CSS for comment history functionality */
+
+/* Comment section containers */
+#edit-horse-comments {
+  border: 1px solid #e0e0e0;
+  border-radius: 8px;
+  padding: 15px;
+  background-color: #fafafa;
+  margin-bottom: 20px;
+}
+
+.existing-comment-container {
+  margin-bottom: 15px;
+}
+
+.comment-date {
+  font-size: 13px;
+  color: #666;
+  font-style: italic;
+  margin-left: 10px;
+}
+
+.comment-divider {
+  margin: 15px 0;
+  text-align: center;
+  position: relative;
+}
+
+.comment-divider:before {
+  content: "";
+  position: absolute;
+  top: 50%;
+  left: 0;
+  right: 0;
+  border-top: 1px solid #e0e0e0;
+  z-index: 1;
+}
+
+.comment-divider span {
+  background: #fafafa;
+  padding: 0 10px;
+  position: relative;
+  z-index: 2;
+  color: #666;
+  font-size: 14px;
+}
+
+.new-comment-container {
+  margin-top: 15px;
+}
+
+.comment-timestamp {
+  display: flex;
+  align-items: center;
+  gap: 6px;
+  color: #666;
+  font-size: 13px;
+  margin-top: 5px;
+}

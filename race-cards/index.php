@@ -39,7 +39,6 @@ function normalizeRegion($region) {
     return isset($regionMap[$region]) ? $regionMap[$region] : $region;
 }
 
-// Continue with the rest of your dashboard code
 ?>
 
 <!DOCTYPE html>
@@ -72,24 +71,11 @@ function normalizeRegion($region) {
     <?php include '../test/app-header.php'; ?>
 
 
-    <!-- Date Navigation -->
+    <!-- Dynamic Date Navigation -->
     <div class="date-navigation">
         <div class="container">
-            <div class="date-slider">
-                <?php
-                // Create date slider
-                $today = strtotime('2025-05-04'); // Using the date from your content
-                for ($i = -3; $i <= 3; $i++) {
-                    $date = strtotime("$i days", $today);
-                    $isActive = $i === 0 ? 'active' : '';
-                    
-                    echo '<div class="date-item ' . $isActive . '">';
-                    echo '<div class="day-name">' . date('D', $date) . '</div>';
-                    echo '<div class="day-number">' . date('j', $date) . '</div>';
-                    echo '<div class="day-month">' . date('M', $date) . '</div>';
-                    echo '</div>';
-                }
-                ?>
+            <div class="date-slider" id="dateSlider">
+                <!-- Dates will be inserted here by JavaScript -->
             </div>
         </div>
     </div>
@@ -123,7 +109,7 @@ function normalizeRegion($region) {
             <?php 
             foreach ($allCourses as $courseName => $courseData):
                 // Count the number of races at this course
-                $raceCount = count($courseData['races']);
+                // $raceCount = count($courseData['races']);
                 // Get the region for this course - use the first race's region if available
                 $region = '';
                 if (!empty($courseData['races'])) {
@@ -148,7 +134,7 @@ function normalizeRegion($region) {
                     <div class="course-header turf" data-action="Click to expand">
                         <h2>
                             <img class="course-logo"> <?php echo htmlspecialchars($courseName); ?>
-                            <span class="race-count"><?php echo $raceCount; ?> races</span>
+                            <!-- <span class="race-count"><?php echo $raceCount; ?> races</span> -->
                         </h2>
                         <div class="toggle-icon">▶</div>
                     </div>
@@ -162,7 +148,7 @@ function normalizeRegion($region) {
                             <!-- Race Card from JSON data -->
                             <div class="race-card">
                                 <div class="race-status-badge status-upcoming">
-                                    <i class="fas fa-clock"></i> Upcoming
+                                    <i class="fas fa-clock"></i> Upcoming - DEMO
                                 </div>
                                 <div class="race-header">
                                     <div class="race-header-left">
@@ -319,7 +305,7 @@ function normalizeRegion($region) {
                                                     <td class="age-col"><?php echo htmlspecialchars($runner['age']); ?></td>
                                                     <td class="weight-col"><?php echo floor($runner['lbs']/14); ?>-<?php echo $runner['lbs'] % 14; ?></td>
                                                     <td class="odds-col">
-                                                        <div class="odds-display">5/1</div>
+                                                        <div class="odds-display">5/1 - DEMO</div>
                                                     </td>
                                                     <td class="actions-col">
                                                         <div class="table-actions">
@@ -346,15 +332,15 @@ function normalizeRegion($region) {
                                 <div class="race-actions">
                                     <div class="action-group">
                                         <button class="race-action-btn">
-                                            <i class="fas fa-chart-bar"></i> Stats
+                                            <i class="fas fa-chart-bar"></i> Stats - DEMO
                                         </button>
                                         <button class="race-action-btn">
-                                            <i class="fas fa-history"></i> Past Results
+                                            <i class="fas fa-history"></i> Past Results - DEMO
                                         </button>
                                     </div>
                                     <div class="action-group">
                                         <button class="race-action-btn primary">
-                                            <i class="fas fa-play"></i> Livestream
+                                            <i class="fas fa-play"></i> Livestream - DEMO
                                         </button>
                                     </div>
                                 </div>
@@ -509,16 +495,16 @@ function normalizeRegion($region) {
                 </div>
             </div>
             <div class="bet-slip-odds">
-                <div class="bet-slip-label">Odds:</div>
-                <div class="bet-slip-value">5/1</div>
+            <div class="bet-slip-label">Odds:</div>
+            <input type="text" class="bet-slip-odds-input" placeholder="Enter odds">
             </div>
             <div class="bet-slip-stake">
                 <div class="bet-slip-label">Stake (£):</div>
                 <input type="number" class="bet-slip-stake-input" value="5" min="1">
             </div>
             <div class="bet-slip-returns">
-                <div class="bet-slip-label">Returns:</div>
-                <div class="bet-slip-value">£30.00</div>
+           <div class="bet-slip-label">Returns:</div>
+           <div class="bet-slip-value">£0.00</div>
             </div>
         </div>
         <div class="bet-slip-actions">
@@ -564,6 +550,57 @@ function normalizeRegion($region) {
             });
         });
     });
+   
+    // Dynamic date 
+    document.addEventListener('DOMContentLoaded', function() {
+            const dateSlider = document.getElementById('dateSlider');
+            
+            // Get current date
+            const today = new Date();
+            
+            // Create date items for 3 days before, today, and 3 days after
+            for (let i = -3; i <= 3; i++) {
+                const currentDate = new Date(today);
+                currentDate.setDate(today.getDate() + i);
+                
+                const dateItem = document.createElement('div');
+                dateItem.className = 'date-item' + (i === 0 ? ' active' : '');
+                
+                // Get day name (Mon, Tue, etc.)
+                const dayName = document.createElement('div');
+                dayName.className = 'day-name';
+                dayName.textContent = currentDate.toLocaleDateString('en-US', { weekday: 'short' });
+                
+                // Get day number (1-31)
+                const dayNumber = document.createElement('div');
+                dayNumber.className = 'day-number';
+                dayNumber.textContent = currentDate.getDate();
+                
+                // Get month name (Jan, Feb, etc.)
+                const dayMonth = document.createElement('div');
+                dayMonth.className = 'day-month';
+                dayMonth.textContent = currentDate.toLocaleDateString('en-US', { month: 'short' });
+                
+                // Append all elements to the date item
+                dateItem.appendChild(dayName);
+                dateItem.appendChild(dayNumber);
+                dateItem.appendChild(dayMonth);
+                
+                // Add click event to make date active
+                dateItem.addEventListener('click', function() {
+                    // Remove active class from all date items
+                    document.querySelectorAll('.date-item').forEach(item => {
+                        item.classList.remove('active');
+                    });
+                    
+                    // Add active class to clicked date item
+                    this.classList.add('active');
+                });
+                
+                // Append date item to date slider
+                dateSlider.appendChild(dateItem);
+            }
+        });
 </script>
 
 

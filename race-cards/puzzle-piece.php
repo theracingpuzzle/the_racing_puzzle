@@ -13,7 +13,7 @@ $nextHorseId = null;
 $horseIndex = -1;
 
 // Path to JSON file
-$jsonFilePath = '../racecards/assets/js/2025-05-07.json';
+$jsonFilePath = '../race-cards/runners/2025-05-10.json';
 
 // Set error handling
 error_reporting(E_ALL);
@@ -385,28 +385,28 @@ function getDrawAdvantage($drawNumber, $totalRunners, $distance) {
       
       <div class="performance-grid">
         <div class="perf-item">
-          <div class="perf-label">Speed</div>
+          <div class="perf-label">Speed - DEMO</div>
           <div class="perf-value">75%</div>
           <div class="perf-bar">
             <div class="perf-fill" style="width: 75%"></div>
           </div>
         </div>
         <div class="perf-item">
-          <div class="perf-label">Stamina</div>
+          <div class="perf-label">Stamina - DEMO</div>
           <div class="perf-value">82%</div>
           <div class="perf-bar">
             <div class="perf-fill" style="width: 82%"></div>
           </div>
         </div>
         <div class="perf-item">
-          <div class="perf-label">Course Form</div>
+          <div class="perf-label">Course Form - DEMO</div>
           <div class="perf-value">60%</div>
           <div class="perf-bar">
             <div class="perf-fill" style="width: 60%"></div>
           </div>
         </div>
         <div class="perf-item">
-          <div class="perf-label">Going Preference</div>
+          <div class="perf-label">Going Preference - DEMO</div>
           <div class="perf-value">91%</div>
           <div class="perf-bar">
             <div class="perf-fill" style="width: 91%"></div>
@@ -536,9 +536,9 @@ function getDrawAdvantage($drawNumber, $totalRunners, $distance) {
         <button class="action-button dislike" onclick="navigateToPrevHorse()">
           <i class="fas fa-times"></i>
         </button>
-        <button class="action-button favorite" onclick="goBack()">
+        <!-- <button class="action-button favorite" onclick="goBack()">
           <i class="fas fa-reply"></i>
-        </button>
+        </button> -->
         <button class="action-button like" onclick="navigateToNextHorse()">
           <i class="fas fa-heart"></i>
         </button>

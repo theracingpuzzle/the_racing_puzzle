@@ -1,0 +1,587 @@
+:root {
+    --primary-color: #3a7bd5;
+    --primary-light: rgba(58, 123, 213, 0.1);
+    --secondary-color: #00d2ff;
+    --success-color: #4caf50;
+    --warning-color: #ff9800;
+    --danger-color: #f44336;
+    --info-color: #2196f3;
+    --dark-color: #333;
+    --light-color: #f5f5f5;
+    --text-color: #333;
+    --text-muted: #6c757d;
+    --bg-color: #f8f9fa;
+    --card-bg: #ffffff;
+    --border-color: #e9ecef;
+    --dark-bg: #282c34;
+    --medium-bg: #f1f3f5;
+    --radius-sm: 4px;
+    --radius-md: 8px;
+    --radius-lg: 12px;
+    --shadow-sm: 0 1px 3px rgba(0,0,0,0.12), 0 1px 2px rgba(0,0,0,0.24);
+    --shadow-md: 0 4px 6px rgba(0,0,0,0.1);
+    --shadow-lg: 0 10px 15px rgba(0,0,0,0.1);
+    --transition: all 0.3s ease;
+}
+
+/* Base Styles */
+* {
+    margin: 0;
+    padding: 0;
+    box-sizing: border-box;
+}
+
+body {
+    font-family: 'Montserrat', sans-serif;
+    background-color: var(--bg-color);
+    color: var(--text-color);
+    line-height: 1.6;
+}
+
+h1, h2, h3, h4, h5, h6 {
+    font-weight: 600;
+    margin-bottom: 10px;
+}
+
+p {
+    margin-bottom: 15px;
+}
+
+small {
+    font-size: 0.85rem;
+    color: var(--text-muted);
+}
+
+a {
+    color: var(--primary-color);
+    text-decoration: none;
+    transition: var(--transition);
+}
+
+a:hover {
+    color: var(--secondary-color);
+}
+
+/* Layout Utilities */
+.container {
+    max-width: 1200px;
+    margin: 0 auto;
+    padding: 0 15px;
+}
+
+.d-flex {
+    display: flex;
+}
+
+.flex-wrap {
+    flex-wrap: wrap;
+}
+
+.justify-between {
+    justify-content: space-between;
+}
+
+.align-center {
+    align-items: center;
+}
+
+.gap-10 {
+    gap: 10px;
+}
+
+.gap-20 {
+    gap: 20px;
+}
+
+.mb-10 {
+    margin-bottom: 10px;
+}
+
+.mb-20 {
+    margin-bottom: 20px;
+}
+
+.mt-20 {
+    margin-top: 20px;
+}
+
+/* Card Styles */
+.card {
+    background-color: var(--card-bg);
+    border-radius: var(--radius-md);
+    box-shadow: var(--shadow-md);
+    margin-bottom: 20px;
+    overflow: hidden;
+}
+
+.card-header {
+    padding: 15px 20px;
+    border-bottom: 1px solid var(--border-color);
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+}
+
+.card-body {
+    padding: 20px;
+}
+
+.card-footer {
+    padding: 15px 20px;
+    border-top: 1px solid var(--border-color);
+}
+
+.text-center {
+    text-align: center;
+}
+
+/* Button Styles */
+.btn {
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    padding: 8px 16px;
+    border-radius: var(--radius-sm);
+    font-weight: 500;
+    cursor: pointer;
+    transition: var(--transition);
+    border: none;
+    outline: none;
+}
+
+.btn-sm {
+    padding: 5px 10px;
+    font-size: 0.85rem;
+}
+
+.btn-primary {
+    background-color: var(--primary-color);
+    color: white;
+}
+
+.btn-primary:hover {
+    background-color: #2a6ac0;
+}
+
+.btn-secondary {
+    background-color: var(--medium-bg);
+    color: var(--text-color);
+}
+
+.btn-secondary:hover {
+    background-color: #e0e0e0;
+}
+
+.btn-outline {
+    background-color: transparent;
+    border: 1px solid var(--border-color);
+}
+
+.btn-outline:hover {
+    background-color: var(--medium-bg);
+}
+
+/* Badge Styles */
+.badge {
+    padding: 4px 8px;
+    border-radius: 50px;
+    font-size: 0.75rem;
+    font-weight: 600;
+    display: inline-block;
+}
+
+.badge-success {
+    background-color: var(--success-color);
+    color: white;
+}
+
+.badge-warning {
+    background-color: var(--warning-color);
+    color: white;
+}
+
+.badge-danger {
+    background-color: var(--danger-color);
+    color: white;
+}
+
+.badge-info {
+    background-color: var(--info-color);
+    color: white;
+}
+
+.badge-primary {
+    background-color: var(--primary-color);
+    color: white;
+}
+
+/* Text Color Utilities */
+.text-success {
+    color: var(--success-color);
+}
+
+.text-danger {
+    color: var(--danger-color);
+}
+
+/* App Header */
+.app-header {
+    background-color: white;
+    box-shadow: var(--shadow-sm);
+    padding: 15px 0;
+    position: sticky;
+    top: 0;
+    z-index: 100;
+}
+
+.header-container {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    max-width: 1200px;
+    margin: 0 auto;
+    padding: 0 15px;
+}
+
+.logo {
+    font-size: 1.5rem;
+    font-weight: 700;
+    color: var(--primary-color);
+}
+
+.user-menu {
+    display: flex;
+    align-items: center;
+    gap: 15px;
+}
+
+.nav-icon {
+    font-size: 1.25rem;
+    color: var(--text-muted);
+    cursor: pointer;
+}
+
+.avatar {
+    width: 36px;
+    height: 36px;
+    background-color: var(--primary-color);
+    color: white;
+    border-radius: 50%;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    font-weight: 600;
+}
+
+/* Content */
+.content {
+    padding-bottom: 65px; /* Account for bottom nav */
+}
+
+/* Stats Cards */
+.stats-grid {
+    display: grid;
+    grid-template-columns: repeat(auto-fit, minmax(240px, 1fr));
+    gap: 20px;
+}
+
+.stat-card {
+    background-color: var(--card-bg);
+    padding: 20px;
+    border-radius: var(--radius-md);
+    box-shadow: var(--shadow-md);
+}
+
+.stat-icon {
+    width: 45px;
+    height: 45px;
+    border-radius: var(--radius-sm);
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    font-size: 1.25rem;
+    color: white;
+}
+
+.icon-primary {
+    background-color: var(--primary-color);
+}
+
+.icon-success {
+    background-color: var(--success-color);
+}
+
+.icon-warning {
+    background-color: var(--warning-color);
+}
+
+.icon-info {
+    background-color: var(--info-color);
+}
+
+.trend-indicator {
+    font-size: 0.85rem;
+    font-weight: 600;
+    padding: 4px 8px;
+    border-radius: 50px;
+}
+
+.trend-up {
+    color: var(--success-color);
+}
+
+.trend-down {
+    color: var(--danger-color);
+}
+
+.trend-neutral {
+    color: var(--text-muted);
+}
+
+.progress-container {
+    height: 6px;
+    background-color: var(--border-color);
+    border-radius: 50px;
+    margin: 10px 0;
+}
+
+.progress-bar {
+    height: 100%;
+    border-radius: 50px;
+}
+
+.bg-primary {
+    background-color: var(--primary-color);
+}
+
+.bg-success {
+    background-color: var(--success-color);
+}
+
+.bg-warning {
+    background-color: var(--warning-color);
+}
+
+.bg-danger {
+    background-color: var(--danger-color);
+}
+
+.bg-info {
+    background-color: var(--info-color);
+}
+
+/* Filter Pills */
+.filter-pills {
+    display: flex;
+    gap: 10px;
+}
+
+.filter-pill {
+    padding: 5px 12px;
+    background-color: var(--medium-bg);
+    border-radius: 50px;
+    font-size: 0.85rem;
+    cursor: pointer;
+    transition: var(--transition);
+}
+
+.filter-pill.active {
+    background-color: var(--primary-color);
+    color: white;
+}
+
+/* Chart Container */
+.chart-container {
+    position: relative;
+    height: 300px;
+}
+
+/* Donut Chart Inner Label */
+.pie-stats {
+    position: relative;
+    height: 180px;
+    width: 180px;
+}
+
+.donut-inner {
+    position: absolute;
+    top: 50%;
+    left: 50%;
+    transform: translate(-50%, -50%);
+    text-align: center;
+}
+
+.donut-label {
+    font-size: 0.85rem;
+    color: var(--text-muted);
+}
+
+.donut-value {
+    font-size: 1.5rem;
+    font-weight: 600;
+}
+
+/* Profit/Loss Pill */
+.profit-loss-pill {
+    display: inline-block;
+    padding: 8px 16px;
+    border-radius: 50px;
+    font-weight: 600;
+}
+
+.profit-pill {
+    background-color: rgba(76, 175, 80, 0.1);
+    color: var(--success-color);
+}
+
+.loss-pill {
+    background-color: rgba(244, 67, 54, 0.1);
+    color: var(--danger-color);
+}
+
+/* Tab Container */
+.tab-container {
+    margin-bottom: 20px;
+}
+
+.tabs {
+    display: flex;
+    border-bottom: 1px solid var(--border-color);
+}
+
+.tab {
+    padding: 12px 20px;
+    cursor: pointer;
+    position: relative;
+    font-weight: 500;
+}
+
+.tab.active {
+    color: var(--primary-color);
+}
+
+.tab.active::after {
+    content: '';
+    position: absolute;
+    bottom: -1px;
+    left: 0;
+    width: 100%;
+    height: 2px;
+    background-color: var(--primary-color);
+}
+
+/* Race Track Indicator */
+.race-track-indicator {
+    height: 6px;
+    background-color: var(--border-color);
+    border-radius: 50px;
+    overflow: hidden;
+}
+
+.race-track-progress {
+    height: 100%;
+    background-color: var(--primary-color);
+    border-radius: 50px;
+}
+
+/* Horse Avatar */
+.horse-avatar {
+    width: 40px;
+    height: 40px;
+    background-color: var(--primary-light);
+    border-radius: 50%;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    color: var(--primary-color);
+}
+
+/* Event Date */
+.event-date {
+    min-width: 60px;
+    height: 60px;
+    background-color: var(--primary-light);
+    border-radius: var(--radius-sm);
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
+}
+
+.event-date-month {
+    text-transform: uppercase;
+    font-size: 0.75rem;
+    font-weight: 600;
+    color: var(--primary-color);
+}
+
+.event-date-day {
+    font-size: 1.5rem;
+    font-weight: 700;
+}
+
+/* Race Card */
+.race-card {
+    padding-bottom: 15px;
+    border-bottom: 1px solid var(--border-color);
+}
+
+/* Bottom Navigation */
+.bottom-nav {
+    position: fixed;
+    bottom: 0;
+    left: 0;
+    width: 100%;
+    background-color: white;
+    box-shadow: 0 -2px 10px rgba(0,0,0,0.1);
+    display: flex;
+    justify-content: space-around;
+    padding: 10px 0;
+    z-index: 100;
+}
+
+.nav-item {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    color: var(--text-muted);
+    text-decoration: none;
+    font-size: 0.85rem;
+}
+
+.nav-item i {
+    font-size: 1.25rem;
+    margin-bottom: 5px;
+}
+
+.nav-item.active {
+    color: var(--primary-color);
+}
+
+/* Responsive Adjustments */
+@media (max-width: 768px) {
+    .stats-grid {
+        grid-template-columns: repeat(2, 1fr);
+    }
+}
+
+@media (max-width: 576px) {
+    .stats-grid {
+        grid-template-columns: 1fr;
+    }
+}
+.profit-loss-pill {
+    display: inline-block;
+    padding: 8px 16px;
+    border-radius: 20px;
+    font-weight: bold;
+    color: white;
+}
+
+.profit-pill {
+    background-color: #28a745; /* Green */
+}
+
+.loss-pill {
+    background-color: #dc3545; /* Red */
+}

@@ -30,7 +30,88 @@ document.addEventListener('DOMContentLoaded', function() {
     
     // Add functionality to all circle-plus buttons - both in card view and table view
     setupBetSlipButtons();
+    
+    // Setup place bet button functionality
+    setupPlaceBetButton();
 });
+
+function setupPlaceBetButton() {
+    // Get the place bet button
+    const placeBetButton = document.querySelector('.bet-slip-actions .btn-primary');
+    
+    if (placeBetButton) {
+        placeBetButton.addEventListener('click', function() {
+            submitBet();
+        });
+    }
+}
+
+function submitBet() {
+    // Get all the necessary data from the bet slip
+    const raceCourseTimeEl = document.getElementById('bet-slip-course-time');
+    const horseNameEl = document.getElementById('bet-slip-horse-name');
+    const jockeyEl = document.getElementById('bet-slip-jockey');
+    const trainerEl = document.getElementById('bet-slip-trainer');
+    const stakeInput = document.querySelector('.bet-slip-stake-input');
+    const oddsInput = document.querySelector('.bet-slip-odds-input');
+    const returnsEl = document.querySelector('.bet-slip-returns .bet-slip-value');
+    
+    // Validate that odds have been entered
+    if (!oddsInput.value.trim()) {
+        alert('Please enter the odds before placing your bet');
+        oddsInput.focus();
+        return;
+    }
+    
+    // Extract the racecourse from the course-time text
+    const raceCourseTime = raceCourseTimeEl.textContent;
+    const raceCourse = raceCourseTime.split(' - ')[0];
+    
+    // Get the stake value
+    const stake = parseFloat(stakeInput.value) || 0;
+    
+    // Create a form to submit the data
+    const form = document.createElement('form');
+    form.method = 'POST';
+    form.action = '../bet-record/includes/process_bet.php';
+    form.style.display = 'none';
+    
+    // Add all required fields to the form
+    const formData = {
+        'bet_type': 'Win',
+        'stake': stake,
+        'selection': horseNameEl.textContent,
+        'odds': oddsInput.value, // Use the actual input value
+        'jockey': jockeyEl.textContent,
+        'trainer': trainerEl.textContent,
+        'outcome': 'Pending',
+        'racecourse': raceCourse
+    };
+    
+    // Create form inputs for each data field
+    for (const key in formData) {
+        const input = document.createElement('input');
+        input.type = 'hidden';
+        input.name = key;
+        input.value = formData[key];
+        form.appendChild(input);
+    }
+    
+    // Append the form to the body
+    document.body.appendChild(form);
+    
+    // Log the form data for debugging
+    console.log('Submitting bet with data:', formData);
+    console.log('Form action:', form.action);
+    
+    // Submit the form
+    form.submit();
+    
+    // Close the modal
+    const betSlipModal = document.getElementById('bet-slip-modal');
+    betSlipModal.style.display = 'none';
+}
+
 
 function setupBetSlipButtons() {
     // Find all circle-plus buttons in table view
@@ -96,7 +177,6 @@ function handleBetSlipButtonClick(buttonElement) {
     openBetSlip(horseName, jockey, trainer, raceCourse, raceTime);
 }
 
-// Function to open the bet slip modal with horse details
 function openBetSlip(horseName, jockey, trainer, raceCourse, raceTime) {
     const modal = document.getElementById('bet-slip-modal');
     const courseTimeEl = document.getElementById('bet-slip-course-time');
@@ -116,24 +196,61 @@ function openBetSlip(horseName, jockey, trainer, raceCourse, raceTime) {
     // Position the modal in the top right
     modal.classList.add('top-right');
     
-    // Calculate potential returns when stake changes
+    // Get the input elements
     const stakeInput = document.querySelector('.bet-slip-stake-input');
+    const oddsInput = document.querySelector('.bet-slip-odds-input'); 
     const returnsEl = document.querySelector('.bet-slip-returns .bet-slip-value');
     
-    // Initial calculation
-    calculateReturns(stakeInput, returnsEl);
+    // Clear the odds input
+    oddsInput.value = '';
     
-    // Setup event listener for stake changes
-    stakeInput.addEventListener('input', function() {
-        calculateReturns(this, returnsEl);
+    // Reset returns to 0
+    returnsEl.textContent = '£0.00';
+    
+    // Remove existing event listeners to prevent duplicates
+    const newStakeInput = stakeInput.cloneNode(true);
+    stakeInput.parentNode.replaceChild(newStakeInput, stakeInput);
+    
+    const newOddsInput = oddsInput.cloneNode(true);
+    oddsInput.parentNode.replaceChild(newOddsInput, oddsInput);
+    
+    // Initial calculation
+    calculateReturns(newStakeInput, newOddsInput, returnsEl); 
+    
+    // Setup new event listeners
+    newStakeInput.addEventListener('input', function() {
+        calculateReturns(newStakeInput, newOddsInput, returnsEl); 
+    });
+    
+    newOddsInput.addEventListener('input', function() {
+        calculateReturns(newStakeInput, newOddsInput, returnsEl);
     });
 }
 
-// Calculate potential returns based on stake
-function calculateReturns(stakeInput, returnsEl) {
+// Update the calculateReturns function to handle empty odds
+function calculateReturns(stakeInput, oddsInput, returnsEl) {
     const stake = parseFloat(stakeInput.value) || 0;
-    // Assuming odds of 5/1 for this example
-    const odds = 5; 
-    const returns = stake + (stake * odds);
+    const oddsValue = oddsInput.value.trim();
+    
+    let returns = 0;
+    
+    // Only calculate if odds value is not empty
+    if (oddsValue) {
+        // Parse odds depending on format (fractional or decimal)
+        if (oddsValue.includes('/')) {
+            // Fractional odds (e.g., 5/1)
+            const [numerator, denominator] = oddsValue.split('/').map(Number);
+            if (!isNaN(numerator) && !isNaN(denominator) && denominator !== 0) {
+                returns = stake + (stake * (numerator / denominator));
+            }
+        } else {
+            // Decimal odds (e.g., 6.0)
+            const decimalOdds = parseFloat(oddsValue);
+            if (!isNaN(decimalOdds)) {
+                returns = stake * decimalOdds;
+            }
+        }
+    }
+    
     returnsEl.textContent = `£${returns.toFixed(2)}`;
 }

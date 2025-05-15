@@ -60,36 +60,40 @@ if ($_SERVER["REQUEST_METHOD"] == "POST") {
         echo "User ID: $user_id\n";
         
         // Calculate returns if bet won
-        $returns = 0;
-        if ($outcome == 'Won') {
-            if (strpos($odds, '/') !== false) {
-                list($numerator, $denominator) = explode('/', $odds);
-                $returns = $stake + ($stake * $numerator / $denominator);
-            } else {
-                $returns = $stake * floatval($odds);
-            }
-        }
-        echo "Calculated returns: $returns\n";
+$returns = 0;
+if ($outcome == 'Won') {
+    if (strpos($odds, '/') !== false) {
+        list($numerator, $denominator) = explode('/', $odds);
+        $returns = $stake + ($stake * $numerator / $denominator);
+    } else {
+        $returns = $stake * floatval($odds);
+    }
+}
+echo "Calculated returns: $returns\n";
+
+// Calculate profit (new code)
+$profit = $returns - $stake;
+echo "Calculated profit: $profit\n";
+
+// Insert into database (updated SQL)
+$sql = "INSERT INTO bet_records (bet_type, stake, selection, racecourse, odds, jockey, trainer, outcome, returns, user_id, profit) 
+        VALUES (:bet_type, :stake, :selection, :racecourse, :odds, :jockey, :trainer, :outcome, :returns, :user_id, :profit)";
+echo "SQL: $sql\n";
         
-        // Insert into database
-        $sql = "INSERT INTO bet_records (bet_type, stake, selection, racecourse, odds, jockey, trainer, outcome, returns, user_id) 
-                VALUES (:bet_type, :stake, :selection, :racecourse, :odds, :jockey, :trainer, :outcome, :returns, :user_id)";
-        echo "SQL: $sql\n";
-                
-        $stmt = $conn->prepare($sql);
-        echo "Statement prepared\n";
-        
-        $stmt->bindParam(':bet_type', $bet_type);
-        $stmt->bindParam(':stake', $stake);
-        $stmt->bindParam(':selection', $selection);
-        $stmt->bindParam(':racecourse', $racecourse);
-        $stmt->bindParam(':odds', $odds);
-        $stmt->bindParam(':jockey', $jockey);
-        $stmt->bindParam(':trainer', $trainer);
-        $stmt->bindParam(':outcome', $outcome);
-        $stmt->bindParam(':returns', $returns);
-        $stmt->bindParam(':user_id', $user_id);
-        echo "Parameters bound\n";
+$stmt = $conn->prepare($sql);
+echo "Statement prepared\n";
+
+$stmt->bindParam(':bet_type', $bet_type);
+$stmt->bindParam(':stake', $stake);
+$stmt->bindParam(':selection', $selection);
+$stmt->bindParam(':racecourse', $racecourse);
+$stmt->bindParam(':odds', $odds);
+$stmt->bindParam(':jockey', $jockey);
+$stmt->bindParam(':trainer', $trainer);
+$stmt->bindParam(':outcome', $outcome);
+$stmt->bindParam(':returns', $returns);
+$stmt->bindParam(':user_id', $user_id);
+$stmt->bindParam(':profit', $profit); // New parameter binding
         
         // Execute and check success
         echo "About to execute statement\n";

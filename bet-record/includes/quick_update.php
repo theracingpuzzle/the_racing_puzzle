@@ -1,102 +1,65 @@
 <?php
-// bet-record/includes/quick_update.php
+// includes/quick_update.php
+header('Content-Type: application/json');
+
+// Include database connection
+require_once "../../includes/db-connection.php";
+
+// Include helper functions
+require_once "functions.php";
 
 // Start session if not already started
 if (session_status() === PHP_SESSION_NONE) {
     session_start();
 }
 
-// Require authentication
-require_once __DIR__ . '/../../user-management/auth.php';
-requireLogin();
-
-// Database connection
-require_once __DIR__ . "/../../includes/db-connection.php";
-
-// Initialize response
-$response = [
-    'success' => false,
-    'message' => '',
-    'returns' => 0
-];
-
-// Process quick update request
-if ($_SERVER["REQUEST_METHOD"] == "POST" && isset($_POST['quick_update'])) {
-    try {
-        // Verify required parameters
-        if (!isset($_POST['bet_id']) || empty($_POST['bet_id']) || !isset($_POST['outcome']) || empty($_POST['outcome'])) {
-            throw new Exception('Bet ID and outcome are required');
-        }
-        
-        // Sanitize input data
-        $bet_id = filter_var($_POST['bet_id'], FILTER_SANITIZE_NUMBER_INT);
-        $outcome = htmlspecialchars($_POST['outcome']);
-        
-        // Validate outcome
-        $valid_outcomes = ['Won', 'Lost', 'Pending', 'Void'];
-        if (!in_array($outcome, $valid_outcomes)) {
-            throw new Exception('Invalid outcome value');
-        }
-        
-        // Get the current user ID from session
-        $user_id = $_SESSION['user_id'];
-        
-        // Get current bet details to calculate returns if needed
-        $get_sql = "SELECT stake, odds FROM bet_records WHERE id = :bet_id AND user_id = :user_id";
-        $get_stmt = $conn->prepare($get_sql);
-        $get_stmt->bindParam(':bet_id', $bet_id);
-        $get_stmt->bindParam(':user_id', $user_id);
-        $get_stmt->execute();
-        
-        if ($get_stmt->rowCount() == 0) {
-            throw new Exception('Bet not found or you do not have permission to update it');
-        }
-        
-        $bet_details = $get_stmt->fetch(PDO::FETCH_ASSOC);
-        $stake = floatval($bet_details['stake']);
-        $odds = $bet_details['odds'];
-        
-        // Calculate returns based on outcome
-        $returns = 0;
-        if ($outcome == 'Won') {
-            if (strpos($odds, '/') !== false) {
-                list($numerator, $denominator) = explode('/', $odds);
-                $returns = $stake + ($stake * $numerator / $denominator);
-            } else {
-                $returns = $stake * floatval($odds);
-            }
-        }
-        
-        // Update bet outcome in database
-        $update_sql = "UPDATE bet_records SET 
-                      outcome = :outcome, 
-                      returns = :returns 
-                      WHERE id = :bet_id AND user_id = :user_id";
-                
-        $update_stmt = $conn->prepare($update_sql);
-        $update_stmt->bindParam(':outcome', $outcome);
-        $update_stmt->bindParam(':returns', $returns);
-        $update_stmt->bindParam(':bet_id', $bet_id);
-        $update_stmt->bindParam(':user_id', $user_id);
-        
-        // Execute and check success
-        if ($update_stmt->execute()) {
-            $response['success'] = true;
-            $response['message'] = "Bet outcome updated successfully";
-            $response['returns'] = $returns;
-        } else {
-            $response['message'] = "Error updating bet outcome: " . implode(", ", $update_stmt->errorInfo());
-        }
-    } catch(PDOException $e) {
-        $response['message'] = "Database error: " . $e->getMessage();
-    } catch(Exception $e) {
-        $response['message'] = "Error: " . $e->getMessage();
-    }
-} else {
-    $response['message'] = "Invalid request";
+// Check if user is logged in
+if (!isset($_SESSION['user_id'])) {
+    echo json_encode(['success' => false, 'message' => 'User not authenticated']);
+    exit;
 }
 
-// Return JSON response
-header('Content-Type: application/json');
-echo json_encode($response);
+$user_id = $_SESSION['user_id'];
+
+// Check if request is POST
+if ($_SERVER['REQUEST_METHOD'] !== 'POST') {
+    echo json_encode(['success' => false, 'message' => 'Invalid request method']);
+    exit;
+}
+
+// Check for required parameters
+if (!isset($_POST['id']) || empty($_POST['id']) || !isset($_POST['outcome'])) {
+    echo json_encode(['success' => false, 'message' => 'Missing required parameters']);
+    exit;
+}
+
+try {
+    $bet_id = (int)$_POST['id'];
+    $outcome = $_POST['outcome'];
+    
+    // Validate outcome
+    if (!in_array($outcome, ['Won', 'Lost', 'Pending', 'Void'])) {
+        echo json_encode(['success' => false, 'message' => 'Invalid outcome value']);
+        exit;
+    }
+    
+    // First check if the bet exists and belongs to the user
+    $bet_check = $conn->prepare("SELECT id FROM bet_records WHERE id = ? AND user_id = ?");
+    $bet_check->execute([$bet_id, $user_id]);
+    $bet_data = $bet_check->fetch();
+    
+    if (!$bet_data) {
+        echo json_encode(['success' => false, 'message' => 'Bet not found or you do not have permission to update it']);
+        exit;
+    }
+    
+    // Update the outcome
+    $stmt = $conn->prepare("UPDATE bet_records SET outcome = ? WHERE id = ? AND user_id = ?");
+    $stmt->execute([$outcome, $bet_id, $user_id]);
+    
+    echo json_encode(['success' => true, 'message' => 'Bet outcome updated to ' . $outcome]);
+    
+} catch (PDOException $e) {
+    echo json_encode(['success' => false, 'message' => 'Database error: ' . $e->getMessage()]);
+}
 ?>
