@@ -47,25 +47,116 @@ function createDatabase($db_path) {
         $tempConn = new PDO('sqlite:' . $db_path);
         $tempConn->setAttribute(PDO::ATTR_ERRMODE, PDO::ERRMODE_EXCEPTION);
         
-        // Create your tables
-        // REPLACE THESE WITH YOUR ACTUAL TABLE DEFINITIONS
+        // Create all tables based on your schema
+        
+        // Table: test
+        $tempConn->exec('CREATE TABLE test (
+            id INTEGER PRIMARY KEY
+        )');
+        
+        // Table: racecourses
+        $tempConn->exec('CREATE TABLE racecourses (
+            id INTEGER PRIMARY KEY,
+            name TEXT
+        )');
+        
+        // Table: horse_tracker
+        $tempConn->exec('CREATE TABLE horse_tracker (
+            id INTEGER PRIMARY KEY,
+            horse_name TEXT NOT NULL,
+            trainer TEXT,
+            notes TEXT,
+            date_added TEXT DEFAULT datetime(\'now\'),
+            user_id INTEGER NOT NULL DEFAULT 0,
+            horse_id INTEGER NOT NULL DEFAULT 0,
+            silk_url TEXT
+        )');
+        
+        // Table: users
         $tempConn->exec('CREATE TABLE users (
-            id INTEGER PRIMARY KEY AUTOINCREMENT,
-            username TEXT NOT NULL UNIQUE,
-            password TEXT NOT NULL,
-            email TEXT,
+            user_id INTEGER PRIMARY KEY,
+            username TEXT NOT NULL,
+            email TEXT NOT NULL,
+            password_hash TEXT NOT NULL,
+            password_reset_token TEXT,
+            password_reset_expires DATETIME,
+            registration_date DATETIME DEFAULT CURRENT_TIMESTAMP,
+            is_active INTEGER DEFAULT 1
+        )');
+        
+        // Table: user_profiles
+        $tempConn->exec('CREATE TABLE user_profiles (
+            profile_id INTEGER PRIMARY KEY,
+            user_id INTEGER NOT NULL,
+            display_name TEXT,
+            favorite_racing_type TEXT,
+            theme TEXT DEFAULT "light",
+            newsletter_subscription INTEGER DEFAULT 0
+        )');
+        
+        // Table: leagues
+        $tempConn->exec('CREATE TABLE leagues (
+            id INTEGER PRIMARY KEY,
+            name TEXT NOT NULL,
+            description TEXT,
+            creator_id INTEGER NOT NULL,
+            ranking_type TEXT NOT NULL,
+            pin TEXT NOT NULL,
             created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP
         )');
         
-        // Create any other tables your application needs
-        // $tempConn->exec('CREATE TABLE your_other_table (...)');
+        // Table: league_members
+        $tempConn->exec('CREATE TABLE league_members (
+            league_id INTEGER NOT NULL,
+            user_id INTEGER NOT NULL,
+            joined_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
+            PRIMARY KEY (league_id, user_id)
+        )');
+        
+        // Table: league_bets
+        $tempConn->exec('CREATE TABLE league_bets (
+            id INTEGER PRIMARY KEY,
+            league_id INTEGER NOT NULL,
+            user_id INTEGER NOT NULL,
+            race_id INTEGER NOT NULL,
+            horse_id INTEGER NOT NULL,
+            bet_amount REAL NOT NULL,
+            odds TEXT NOT NULL,
+            is_winner BOOLEAN DEFAULT 0,
+            returns REAL DEFAULT 0,
+            bet_date TIMESTAMP DEFAULT CURRENT_TIMESTAMP
+        )');
+        
+        // Table: bet_records
+        $tempConn->exec('CREATE TABLE bet_records (
+            id INTEGER PRIMARY KEY,
+            date_added TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
+            bet_type VARCHAR(50) NOT NULL,
+            stake DECIMAL(10, 2) NOT NULL,
+            selection VARCHAR(100) NOT NULL,
+            racecourse VARCHAR(100) NOT NULL,
+            odds VARCHAR(20) NOT NULL,
+            jockey VARCHAR(100) NOT NULL,
+            trainer VARCHAR(100) NOT NULL,
+            outcome VARCHAR(20) NOT NULL,
+            returns DECIMAL(10, 2) DEFAULT 0,
+            user_id INTEGER NOT NULL DEFAULT 0,
+            parent_bet_id INTEGER,
+            profit DECIMAL(10, 2) DEFAULT 0
+        )');
         
         // Add a test user
-        $password = password_hash('password123', PASSWORD_DEFAULT);
-        $tempConn->exec("INSERT INTO users (username, password, email) 
-                         VALUES ('testuser', '$password', 'test@example.com')");
+        $password_hash = password_hash('password123', PASSWORD_DEFAULT);
+        $tempConn->exec("INSERT INTO users (username, email, password_hash, is_active) 
+                         VALUES ('testuser', 'test@example.com', '$password_hash', 1)");
         
-        // Add any other initial data
+        // Create test user profile
+        $tempConn->exec("INSERT INTO user_profiles (user_id, display_name, theme) 
+                         VALUES (1, 'Test User', 'light')");
+        
+        // Add some test data for racecourses
+        $tempConn->exec("INSERT INTO racecourses (name) VALUES ('Ascot')");
+        $tempConn->exec("INSERT INTO racecourses (name) VALUES ('Cheltenham')");
         
         // Set permissions
         chmod($db_path, 0666);
