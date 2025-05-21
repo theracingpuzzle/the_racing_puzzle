@@ -33,6 +33,13 @@ if ($_SERVER["REQUEST_METHOD"] == "POST") {
     error_log("POST request received in index.php");
     error_log("POST data: " . print_r($_POST, true));
 }
+
+?>
+
+<?php 
+require_once '../render-fix.php';
+// Your original page code
+require_once '../render-fix-footer.php';
 ?>
 
 <!DOCTYPE html>
