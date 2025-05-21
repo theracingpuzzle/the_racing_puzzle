@@ -157,4 +157,4 @@ This project is maintained as a private repository for:
 
 ---
 
-© 2025 [Your Name]. Private repository - not for distribution.
+© 2025
